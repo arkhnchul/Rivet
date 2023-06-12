@@ -164,6 +164,9 @@ Build 89 Improve the decoded CROWD36 display and add a debug output
          Add 150 baud support for RTTY and raw FSK
 Build 90 Rewrite the FSK200/1000 block parser to use the newest findings
          Fix the XPA2 decoder being unreliable after a while
+Build 91 F06a detection and parsing improvements in F06
+	 Renaming of FSK 200/500 and FSK 200/1000 to F01 and F06 respectively
+	 XPA/XPA2 minor improvements
                 
 Reported Bugs
 -------------
@@ -172,4 +175,4 @@ Still problems with ..
 CWOWD36 - Lack a fundamental understanding of this mode. Suspect a unknown tone to alphabet map is in use.
 
 CIS36-50 - Messages are OK from stations that start transmitting idle briefly but Rivet has problems with 
-messages from stations which idle constantly.
+messages from stations which idle constantly.
