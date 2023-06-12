@@ -240,8 +240,8 @@ public class XPA2 extends MFSK {
         	}
         // Count the group spaces
         if (tChar==" ") groupCount++;
-        // After 15 group spaces add a line break
-        if (groupCount==15)	{
+        // After 10 group spaces add a line break
+        if (groupCount==10)	{
         	groupCount=0;
         	characterCount=0;
         	theApp.newLineWrite();

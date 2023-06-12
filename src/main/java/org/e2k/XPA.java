@@ -320,8 +320,8 @@ public class XPA extends MFSK {
         	}
         // Count the group spaces
         if (tChar==" ") groupCount++;
-        // After 15 group spaces add a line break
-        if (groupCount==15)	{
+        // After 10 group spaces add a line break
+        if (groupCount==10)	{
         	groupCount=0;
         	theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
          	lineBuffer.delete(0,lineBuffer.length());
