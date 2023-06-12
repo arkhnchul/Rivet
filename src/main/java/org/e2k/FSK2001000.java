@@ -9,6 +9,7 @@
 // GNU General Public License for more details.
 
 // Rivet Copyright (C) 2011 Ian Wraith
+// Copyright (C) 2017 Daniel Ekmann
 // This program comes with ABSOLUTELY NO WARRANTY
 
 package org.e2k;
