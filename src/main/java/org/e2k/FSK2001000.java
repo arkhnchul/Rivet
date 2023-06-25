@@ -356,10 +356,10 @@ public class FSK2001000 extends FSK {
 		if (frameIndex == 1 && data[0] == 0x34 && data[1] == 0x36) {
 			// Check whether this is a pre-transmission test.
 			txType = 1;
-		} else if ((frameIndex == 1 && data[0] == 0x00 && data[1] == 0x00) || (frameIndex > 1 && (frameIndex % 16 != 0) && checkF06aBlock(digits, isValid))) {
+		} else if ((frameIndex == 1 && data[0] == 0x00 && data[1] == 0x00) || (frameIndex > 1 && (frameIndex % 16 != 0) && isValid && checkF06aBlock(digits))) {
 			// Check whether this is F06a.
 			if (txType == 0){
-				theApp.writeLine(String.format("[INFO] F06a detected. Switching to raw binary decoding..."), Color.BLUE, theApp.boldFont);
+				theApp.writeLine(String.format("[INFO] F06a block detected. Switching to raw binary decoding..."), Color.BLUE, theApp.boldFont);
 			}
 			txType = 2;
 		} else if (frameIndex == 1 && data[0] == 0x1b) {
@@ -372,7 +372,7 @@ public class FSK2001000 extends FSK {
 			theApp.writeLine(String.format("[#%d] %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldFont);
 		} else if (txType == 2) {
 			if (frameIndex == 1){
-				theApp.writeLine(String.format("[#%d] [INFO] File named %c%c%c%c%c%c%c%c%c%c%c%c, size %d bytes | CRC %s", frameIndex, data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], getFileSize(data), isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.boldFont);
+				theApp.writeLine(String.format("[#%d] [INFO] File named %s, size %d bytes | CRC %s", frameIndex, getF06aFilename(data), getFileSize(data), isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.boldFont);
 			}
 			else theApp.writeLine(String.format("[#%d] %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldFont);
 		}
@@ -393,13 +393,13 @@ public class FSK2001000 extends FSK {
 	}
 
 	//Check for invalid 10-bit and 8-bit digit values from valid CRC blocks
-	private boolean checkF06aBlock(int di[], boolean va) {
+	private boolean checkF06aBlock(int di[]) {
 		boolean invalidDigits=false;
 		for (int i=0;i<di.length;i++){
 			if (i<12 && di[i]>999) invalidDigits=true;
 			else if (i>11 && di[i]>9) invalidDigits=true;
 		}
-		return (invalidDigits && va);
+		return invalidDigits;
 	}
 
 	//Convert big endian file size from an F06a block 1 into an integer
@@ -411,5 +411,19 @@ public class FSK2001000 extends FSK {
             value |= dataBlock[offset] & 0xFF;
         }
         return value;
+	}
+
+	//Convert the hex from F06a block 1 into a readable ASCII filename and return non-printable characters (except NUL) as hex
+	private String getF06aFilename(int[] dataBlock){
+		String filename = "";
+		for(int i=4;i<16;i++){
+			if ((dataBlock [i] < 32 || dataBlock [i] >= 127) && dataBlock[i] != 0){
+				filename += String.format("[0x%02x]", dataBlock[i]);
+			}
+			else if (dataBlock [i] != 0){
+				filename += (char)dataBlock [i];
+			}
+		}
+		return filename;
 	}
 }
