@@ -48,7 +48,7 @@ public class Rivet {
 	private DisplayView display_view;
 	private static Rivet theApp;
 	private static DisplayFrame window;
-	public final String program_version="Rivet (Build 91) Beta 2";
+	public final String program_version="Rivet (Build 91) Beta 3";
 	public int vertical_scrollbar_value=0;
 	public int horizontal_scrollbar_value=0;
 	public boolean pReady=false;
@@ -56,11 +56,14 @@ public class Rivet {
 	public final Font plainFont=new Font("SanSerif",Font.PLAIN,12);
 	public final Font boldFont=new Font("SanSerif",Font.BOLD,12);
 	public final Font italicFont=new Font("SanSerif",Font.ITALIC,12);
+	public final Font plainMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.PLAIN,12);
+	public final Font boldMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.BOLD,12);
     public XPA xpaHandler=new XPA(this,10);	
     public XPA2 xpa2Handler=new XPA2(this);	
     public CROWD36 crowd36Handler=new CROWD36(this,40);	
     public FSK200500 fsk200500Handler=new FSK200500(this,200);
     public FSK2001000 fsk2001000Handler=new FSK2001000(this,200);
+	public F06a f06aHandler=new F06a(this,200);
     public CIS3650 cis3650Handler=new CIS3650(this);
     public CCIR493 ccir493Handler=new CCIR493(this);
     public RTTY rttyHandler=new RTTY(this);
@@ -80,6 +83,7 @@ public class Rivet {
 	private boolean soundCardInput=false;
 	private boolean wavFileLoadOngoing=false;
 	private boolean invertSignal=false;
+	private boolean f06aASCII=false;
 	private int soundCardInputLevel=0;
 	private boolean soundCardInputTemp;
 	private boolean bitStreamOut=false;
@@ -103,12 +107,13 @@ public class Rivet {
 			"XPA (20 Baud)",
 			"Experimental",
 			"CIS 36-50",
-			"F01",
+			"F01 (FSK200/500)",
 			"CCIR493-4",
-			"F06",
+			"F06 (FSK200/1000)",
 			"GW FSK (100 Baud)",
 			"Baudot",
-			"FSK (Raw)"
+			"FSK (Raw)",
+			"F06a"
 			};
     
 	public static void main(String[] args) {
@@ -137,6 +142,17 @@ public class Rivet {
 		}
 		
 	}
+
+	// Display welcome message
+	public void displayWelcomeMessage(){
+		this.writeLine("Welcome to " + program_version + "! Here is a list of changes for this version:", Color.BLACK, boldFont);
+		this.writeLine("- F06a is now selectable under Modes. Useful for already known F06a schedules.", Color.BLACK, boldFont);
+		this.writeLine("- Improved F06a detection when F06 is selected. Rivet will automatically switch to F06a decoding when it detects so (and viceversa).", Color.BLACK, boldFont);
+		this.writeLine("- F06a can parse data in two formats: Raw binary (default) and ASCII-encoded (for .TXT and .TLG files).", Color.BLACK, boldFont);
+		this.writeLine("  This can be toggled off and on on settings.", Color.BLACK, boldFont);
+		this.writeLine("- Minor changes to XPA and XPA2 parsing.",Color.BLACK, boldFont);
+		this.writeLine("NOTE: This is a beta version developed by priyom.org. Please contact us (link in Help) to report bugs or suggestions.",Color.BLACK, boldFont);
+	}
 	
 	// Setup the window //
 	public void createGUI() {
@@ -160,6 +176,7 @@ public class Rivet {
 		if (width<600) window.setSmallScreen();		
 		// Make certain the program knows the GUI is ready
 		pReady=true;
+		displayWelcomeMessage();
 		}
 
 	class WindowHandler extends WindowAdapter {
@@ -250,6 +267,11 @@ public class Rivet {
 		if (system==11) return true;
 		else return false;
 	}
+
+	public boolean isF06a(){
+		if (system==12) return true;
+		else return false;
+	}
 		
 	// Tell the input thread to start to load a .WAV file
 	public void loadWAVfile(String fileName)	{
@@ -284,6 +306,8 @@ public class Rivet {
 		else if (system==10) rttyHandler.setState(0);
 		// FSK (raw)
 		else if (system==11) fskHandler.setState(0);
+		//F06a
+		else if (system==12) f06aHandler.setState(0);
 		// Ensure the program knows we have a WAV file load ongoing
 		wavFileLoadOngoing=true;
 	}
@@ -320,6 +344,9 @@ public class Rivet {
 				}
 				else if (system==8)	{
 					writeLine(fsk2001000Handler.getQuailty(),Color.BLACK,plainFont);
+				}
+				else if (system==12) {
+					writeLine(f06aHandler.getQuailty(), Color.BLACK,plainFont);
 				}
 				
 				// Once the buffer data has been read we are done
@@ -380,6 +407,8 @@ public class Rivet {
 			else if (system==10) res=rttyHandler.decode(circBuffer,waveData);
 			// FSK (raw)
 			else if (system==11) res=fskHandler.decode(circBuffer,waveData);
+			//F06a
+			else if (system==12) res=f06aHandler.decode(circBuffer,waveData);
 			// Tell the user there has been an error and stop the WAV file from loading
 			if (res==false)	{
 				if (soundCardInput==false)	{
@@ -437,6 +466,10 @@ public class Rivet {
 	
 	public void setStatusLabel (String st)	{
 		window.setStatusLabel(st);
+	}
+
+	public void setModeLabel (String st) {
+		window.setModeLabel(st);
 	}
 
 	public void setLogging(boolean logging) {
@@ -528,7 +561,7 @@ public class Rivet {
 			this.soundCardInput=false;
 		}
 		else	{
-			// CROWD36 , XPA , XPA2 , CIS36-50 , FSK200/500 , FSK200/1000 , CCIR493-4 , GW , RTTY , RDFT , Experimental
+			// CROWD36 , XPA , XPA2 , CIS36-50 , FSK200/500 , FSK200/1000 , CCIR493-4 , GW , RTTY , RDFT , Experimental, F06a
 			if ((system==0)||(system==1)||(system==2)||(system==3)||(system==4)||(system==5)||(system==6)||(system==8)||(system==7)||(system==9)||(system==10)||(system==11)||(system==12))	{
 				WaveData waveSetting=new WaveData();
 				waveSetting.setChannels(1);
@@ -573,6 +606,8 @@ public class Rivet {
 		else if (system==10) rttyHandler.setState(0);
 		// FSK (raw)
 		else if (system==11) fskHandler.setState(0);
+		//F06a
+		else if (system==12) f06aHandler.setState(0);
 		// RDFT
 		//else if (system==12) rdftHandler.setState(0);
 	}
@@ -802,6 +837,17 @@ public class Rivet {
 
 	public void setInvertSignal(boolean invertSignal) {
 		this.invertSignal = invertSignal;
+	}
+
+	public boolean isF06aASCII() {
+		return f06aASCII;
+	}
+
+	public void setF06aASCII(boolean ascii){
+		this.f06aASCII=ascii;
+		if (ascii) f06aHandler.setEncoding(1);
+		else f06aHandler.setEncoding(0);
+		window.menuItemUpdate();
 	}
 	
 	// Save the programs settings in the rivet_settings.xml file
@@ -1360,6 +1406,5 @@ public class Rivet {
 		}
 		return sb.toString();
 	}
-	
 	
 }
