@@ -41,7 +41,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class Rivet {
+public class Rivet implements RivetApp{
 
 	private static boolean RUNNING=true;
 	private DisplayModel display_model;
@@ -53,11 +53,11 @@ public class Rivet {
 	public int horizontal_scrollbar_value=0;
 	public boolean pReady=false;
 	private int system=1;
-	public final Font plainFont=new Font("SanSerif",Font.PLAIN,12);
-	public final Font boldFont=new Font("SanSerif",Font.BOLD,12);
-	public final Font italicFont=new Font("SanSerif",Font.ITALIC,12);
-	public final Font plainMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.PLAIN,12);
-	public final Font boldMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.BOLD,12);
+	private final Font plainFont=new Font("SanSerif",Font.PLAIN,12);
+	private final Font boldFont=new Font("SanSerif",Font.BOLD,12);
+	private final Font italicFont=new Font("SanSerif",Font.ITALIC,12);
+	private final Font plainMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.PLAIN,12);
+	private final Font boldMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.BOLD,12);
     public XPA xpaHandler=new XPA(this,10);	
     public XPA2 xpa2Handler=new XPA2(this);	
     public CROWD36 crowd36Handler=new CROWD36(this,40);	
@@ -145,13 +145,13 @@ public class Rivet {
 
 	// Display welcome message
 	public void displayWelcomeMessage(){
-		this.writeLine("Welcome to " + program_version + "! Here is a list of changes for this version:", Color.BLACK, boldFont);
-		this.writeLine("- F06a is now selectable under Modes. Useful for already known F06a schedules.", Color.BLACK, boldFont);
-		this.writeLine("- Improved F06a detection when F06 is selected. Rivet will automatically switch to F06a decoding when it detects so (and viceversa).", Color.BLACK, boldFont);
-		this.writeLine("- F06a can parse data in two formats: Raw binary (default) and ASCII-encoded (for .TXT and .TLG files).", Color.BLACK, boldFont);
-		this.writeLine("  This can be toggled off and on on settings.", Color.BLACK, boldFont);
-		this.writeLine("- Minor changes to XPA and XPA2 parsing.",Color.BLACK, boldFont);
-		this.writeLine("NOTE: This is a beta version developed by priyom.org. Please contact us (link in Help) to report bugs or suggestions.",Color.BLACK, boldFont);
+		this.writeLine("Welcome to " + program_version + "! Here is a list of changes for this version:", Color.BLACK, getBoldFont());
+		this.writeLine("- F06a is now selectable under Modes. Useful for already known F06a schedules.", Color.BLACK, getBoldFont());
+		this.writeLine("- Improved F06a detection when F06 is selected. Rivet will automatically switch to F06a decoding when it detects so (and viceversa).", Color.BLACK, getBoldFont());
+		this.writeLine("- F06a can parse data in two formats: Raw binary (default) and ASCII-encoded (for .TXT and .TLG files).", Color.BLACK, getBoldFont());
+		this.writeLine("  This can be toggled off and on on settings.", Color.BLACK, getBoldFont());
+		this.writeLine("- Minor changes to XPA and XPA2 parsing.",Color.BLACK, getBoldFont());
+		this.writeLine("NOTE: This is a beta version developed by priyom.org. Please contact us (link in Help) to report bugs or suggestions.",Color.BLACK, getBoldFont());
 	}
 	
 	// Setup the window //
@@ -178,6 +178,26 @@ public class Rivet {
 		pReady=true;
 		displayWelcomeMessage();
 		}
+
+	public Font getPlainFont() {
+		return plainFont;
+	}
+
+	public Font getBoldFont() {
+		return boldFont;
+	}
+
+	public Font getItalicFont() {
+		return italicFont;
+	}
+
+	public Font getPlainMonospaceFont() {
+		return plainMonospaceFont;
+	}
+
+	public Font getBoldMonospaceFont() {
+		return boldMonospaceFont;
+	}
 
 	class WindowHandler extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {	
@@ -277,7 +297,7 @@ public class Rivet {
 	public void loadWAVfile(String fileName)	{
 		String disp;
 		disp=getTimeStamp()+" Loading file "+fileName;
-		writeLine(disp,Color.BLACK,italicFont);
+		writeLine(disp,Color.BLACK, getItalicFont());
 		waveData=inputThread.startFileLoad(fileName);
 		// Make sure the program knows this data is coming from a file
 		waveData.setFromFile(true);
@@ -333,26 +353,26 @@ public class Rivet {
 				// Check if there is anything left to display
 				if (system==0)	{
 					//if (crowd36Handler.getLineCount()>0) writeLine(crowd36Handler.getLineBuffer(),Color.BLACK,plainFont);
-					writeLine(crowd36Handler.lowHighFreqs(),Color.BLACK,plainFont);
+					writeLine(crowd36Handler.lowHighFreqs(),Color.BLACK, getPlainFont());
 					crowd36Handler.toneResults();
 				}
 				else if (system==5)	{
 					//writeLine(cis3650Handler.lineBuffer.toString(),Color.BLACK,plainFont);
 				}
 				else if (system==6)	{
-					writeLine(fsk200500Handler.getQuailty(),Color.BLACK,plainFont);
+					writeLine(fsk200500Handler.getQuailty(),Color.BLACK, getPlainFont());
 				}
 				else if (system==8)	{
-					writeLine(fsk2001000Handler.getQuailty(),Color.BLACK,plainFont);
+					writeLine(fsk2001000Handler.getQuailty(),Color.BLACK, getPlainFont());
 				}
 				else if (system==12) {
-					writeLine(f06aHandler.getQuailty(), Color.BLACK,plainFont);
+					writeLine(f06aHandler.getQuailty(), Color.BLACK, getPlainFont());
 				}
 				
 				// Once the buffer data has been read we are done
 				if (wavFileLoadOngoing==true)	{
 					String disp=getTimeStamp()+" WAV file loaded and analysis complete ("+Long.toString(inputThread.getSampleCounter())+" samples read)";
-					writeLine(disp,Color.BLACK,italicFont);		
+					writeLine(disp,Color.BLACK, getItalicFont());
 					wavFileLoadOngoing=false;
 					}
 				}
@@ -414,7 +434,7 @@ public class Rivet {
 				if (soundCardInput==false)	{
 					inputThread.stopReadingFile();
 					wavFileLoadOngoing=false;
-					writeLine("Error Loading WAV File",Color.RED,theApp.boldFont);
+					writeLine("Error Loading WAV File",Color.RED, theApp.getBoldFont());
 				}
 				
 			}
@@ -1298,30 +1318,30 @@ public class Rivet {
 		// First clear the screen
 		clearScreen();
 		// Version
-		writeLine(program_version,Color.BLACK,theApp.boldFont);
+		writeLine(program_version,Color.BLACK, theApp.getBoldFont());
 		// Cores
 		String cores="Available processors (cores): "+Runtime.getRuntime().availableProcessors();
-		writeLine(cores,Color.BLACK,theApp.boldFont);
+		writeLine(cores,Color.BLACK, theApp.getBoldFont());
 		// Memory available to the JVM
 		String jmem="JVM Free memory (bytes): "+Runtime.getRuntime().freeMemory();
-		writeLine(jmem,Color.BLACK,theApp.boldFont);
+		writeLine(jmem,Color.BLACK, theApp.getBoldFont());
 		// OS
 		String os="OS : "+System.getProperty("os.name")+" ("+System.getProperty("os.version")+")";
-		writeLine(os,Color.BLACK,theApp.boldFont);
+		writeLine(os,Color.BLACK, theApp.getBoldFont());
 		// Screen info
 		Toolkit theKit=window.getToolkit();
 		Dimension wndsize=theKit.getScreenSize();
 		String res="Screen Resolution - Width "+Integer.toString(wndsize.width)+" : Height "+Integer.toString(wndsize.height);
-		writeLine(res,Color.BLACK,theApp.boldFont);
+		writeLine(res,Color.BLACK, theApp.getBoldFont());
 		// Java version
 		String jver="Java : "+System.getProperty("java.vendor")+" ("+System.getProperty("java.version")+")";
-		writeLine(jver,Color.BLACK,theApp.boldFont);
+		writeLine(jver,Color.BLACK, theApp.getBoldFont());
 		// Folder
 		String folder="Working directory : "+System.getProperty("user.dir");
-		writeLine(folder,Color.BLACK,theApp.boldFont);
+		writeLine(folder,Color.BLACK, theApp.getBoldFont());
 		// Current Time
 		String time="Current Time : "+getTimeStamp();
-		writeLine(time,Color.BLACK,theApp.boldFont);
+		writeLine(time,Color.BLACK, theApp.getBoldFont());
 		// Write all of this to clipboard
 		String contents=getAllText();
 		window.setClipboard(contents);

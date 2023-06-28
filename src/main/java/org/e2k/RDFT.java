@@ -77,7 +77,7 @@ public class RDFT extends OFDM {
 			samplesPerSymbol=samplesPerSymbol(122.5,waveData.getSampleRate());
 			// Add a user warning that RDFT doesn't yet decode
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			theApp.writeLine("Please note that this mode is experimental and doesn't work yet !",Color.RED,theApp.italicFont);
+			theApp.writeLine("Please note that this mode is experimental and doesn't work yet !",Color.RED, theApp.getItalicFont());
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			setState(1);
 			return true;
@@ -96,7 +96,7 @@ public class RDFT extends OFDM {
 			    	StringBuilder sb=new StringBuilder();
 			    	sb.append(theApp.getTimeStamp()+" RDFT lead in tones found. Carrier 1 at "+Double.toString(clist.get(0).getFrequencyHZ())+" Hz");
 			    	sb.append(" & Carrier 8 at "+Double.toString(clist.get(7).getFrequencyHZ())+" Hz");
-			    	theApp.writeLine(sb.toString(),Color.BLACK,theApp.boldFont);		
+			    	theApp.writeLine(sb.toString(),Color.BLACK, theApp.getBoldFont());
 			    	// Populate the carrier bins
 			    	populateCarrierTonesBins(clist.get(0).getBinFFT());
 			    	// All done detecting

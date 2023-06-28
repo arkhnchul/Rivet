@@ -21,7 +21,7 @@ public class CROWD36 extends MFSK {
 	private int baudRate=40;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private long energyStartPoint;
@@ -38,7 +38,7 @@ public class CROWD36 extends MFSK {
 	private int syncHighTone=24;
 	private final String DEBUGLETTERS[]={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","0","1","2","3","4","5","6","7","8","9"};
 		
-	public CROWD36 (Rivet tapp,int baud)	{
+	public CROWD36 (RivetApp tapp,int baud)	{
 		baudRate=baud;
 		theApp=tapp;
 	}
@@ -105,10 +105,10 @@ public class CROWD36 extends MFSK {
 				energyStartPoint=sampleCount;
 				energyBuffer.setBufferCounter(0);
 				theApp.setStatusLabel("Calculating Symbol Timing");
-				theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 				theApp.newLineWrite();
 				String sinform="Sync High Tone is "+Integer.toString(syncHighTone);
-				theApp.writeLine(sinform,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(sinform,Color.BLACK, theApp.getItalicFont());
 				theApp.newLineWrite();
 			}
 		}
@@ -176,7 +176,7 @@ public class CROWD36 extends MFSK {
 				lineCount=50;
 			}
 			else 	{
-				theApp.writeChar(ch,Color.BLACK,theApp.boldFont);
+				theApp.writeChar(ch,Color.BLACK, theApp.getBoldFont());
 				if (ch.length()>0) lineCount++;
 			}	
 			if (lineCount==80)	{
@@ -188,8 +188,8 @@ public class CROWD36 extends MFSK {
 		}
 		else	{
 			// Debug
-			if (tone==-1) theApp.writeChar("*",Color.BLACK,theApp.boldFont);
-			else theApp.writeChar(DEBUGLETTERS[tone],Color.BLACK,theApp.boldFont);
+			if (tone==-1) theApp.writeChar("*",Color.BLACK, theApp.getBoldFont());
+			else theApp.writeChar(DEBUGLETTERS[tone],Color.BLACK, theApp.getBoldFont());
 			lineCount++;
 			if (lineCount==80)	{
 				lineCount=0;
@@ -309,12 +309,12 @@ public class CROWD36 extends MFSK {
 	
 	public void toneResults()	{
 		int a;
-		theApp.writeLine(("Low Tone Count "+Integer.toString(toneLowCount)),Color.BLACK,theApp.plainFont); ;
+		theApp.writeLine(("Low Tone Count "+Integer.toString(toneLowCount)),Color.BLACK, theApp.getPlainFont()); ;
 		for (a=0;a<toneCount.length;a++)	{
 			String l="Tone #"+Integer.toString(a)+" "+Integer.toString(toneCount[a]);
-			theApp.writeLine(l,Color.BLACK,theApp.plainFont); 
+			theApp.writeLine(l,Color.BLACK, theApp.getPlainFont());
 		}
-		theApp.writeLine(("High Tone Count "+Integer.toString(toneHighCount)),Color.BLACK,theApp.plainFont); ;
+		theApp.writeLine(("High Tone Count "+Integer.toString(toneHighCount)),Color.BLACK, theApp.getPlainFont()); ;
 		return;
 	}
 

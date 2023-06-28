@@ -152,7 +152,7 @@ public class DisplayView extends JComponent implements Observer {
 		int a;
 		for (a=0;a<DISPLAYCOUNT;a++)	{
 			String line="Line "+Integer.toString(a)+" test";
-			addLine(line,Color.BLACK,theApp.italicFont);
+			addLine(line,Color.BLACK, theApp.getItalicFont());
 		}
 	}
 	

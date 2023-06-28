@@ -21,7 +21,7 @@ public class CCIR493 extends FSK {
 	
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	public StringBuilder lineBuffer=new StringBuilder();
@@ -51,7 +51,7 @@ public class CCIR493 extends FSK {
 	private final double KALMAN2=0.009;
 	private final double EARLYLATEADJUST=5;
 	
-	public CCIR493 (Rivet tapp)	{
+	public CCIR493 (RivetApp tapp)	{
 		theApp=tapp;
 	}
 		
@@ -103,7 +103,7 @@ public class CCIR493 extends FSK {
 				invertedPDXCounter=0;
 				if (theApp.isDebug()==true)	{
 					String dout=theApp.getTimeStamp()+" CCIR493-4 Sync Found";
-					theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+					theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 				}
 				clearMessageBuffer();
 				return true;
@@ -316,7 +316,7 @@ public class CCIR493 extends FSK {
 		// Display the decode
 		int a;
 		for (a=0;a<outLines.length;a++)	{
-			if (outLines[a]!=null) theApp.writeLine(outLines[a],Color.BLACK,theApp.boldFont);
+			if (outLines[a]!=null) theApp.writeLine(outLines[a],Color.BLACK, theApp.getBoldFont());
 		}
 		return;
 	}

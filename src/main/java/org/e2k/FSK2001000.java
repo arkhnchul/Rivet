@@ -22,7 +22,7 @@ public class FSK2001000 extends FSK {
 	private int baudRate=200;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private CircularDataBuffer energyBuffer=new CircularDataBuffer();
@@ -41,7 +41,7 @@ public class FSK2001000 extends FSK {
 	private CRC crcCalculator;
 	private int txType;
 
-	public FSK2001000 (Rivet tapp,int baud)	{
+	public FSK2001000 (RivetApp tapp,int baud)	{
 		baudRate=baud;
 		theApp=tapp;
 		circularBitSet.setTotalLength(288);
@@ -108,7 +108,7 @@ public class FSK2001000 extends FSK {
 			if (sampleCount>0) dout=syncSequenceHunt(circBuf,waveData);
 			else dout=null;
 			if (dout!=null)	{
-				theApp.writeLine(dout,Color.BLACK,theApp.boldFont);
+				theApp.writeLine(dout,Color.BLACK, theApp.getBoldFont());
 				if (theApp.isDebug()==true) setState(3);
 				else setState(2);
 				energyBuffer.setBufferCounter(0);
@@ -138,8 +138,8 @@ public class FSK2001000 extends FSK {
 			if (symbolCounter>=samplesPerSymbol)	{
 				symbolCounter=0;
 				boolean ibit=fsk2001000FreqHalf(circBuf,waveData,0);
-				if (ibit==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-				else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+				if (ibit==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+				else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 				characterCount++;
 				// Display MAXCHARLENGTH characters on a line
 				if (characterCount==MAXCHARLENGTH)	{
@@ -298,7 +298,7 @@ public class FSK2001000 extends FSK {
 
 		// Check whether this block is the in-TX repeat divider.
 		if (checkDividerBlock(frame)) {
-			theApp.writeLine("----------------------------------------------------------", Color.BLUE, theApp.boldFont);
+			theApp.writeLine("----------------------------------------------------------", Color.BLUE, theApp.getBoldFont());
 			return;
 		}
 
@@ -332,7 +332,7 @@ public class FSK2001000 extends FSK {
 		if (frameIndex % 16 == 0) {
 			int frameCount = (data[0] << 3) | (data[1] >> 5);
 			int messageCount = data[1] & 0x1f;
-			theApp.writeLine(String.format("[#%d] [INFO] %d blocks, %d message(s)", frameIndex, frameCount, messageCount), Color.BLUE, theApp.boldFont);
+			theApp.writeLine(String.format("[#%d] [INFO] %d blocks, %d message(s)", frameIndex, frameCount, messageCount), Color.BLUE, theApp.getBoldFont());
 			return;
 		}
 
@@ -358,18 +358,19 @@ public class FSK2001000 extends FSK {
 			txType = 1;
 		} else if ((frameIndex == 1 && data[0] == 0x00 && data[1] == 0x00) || (frameIndex > 1 && (frameIndex % 16 != 0) && isValid && checkF06aBlock(digits))) {
 			// Check whether this is F06a.
-			theApp.writeLine(String.format("[INFO] F06a block detected. Switching to F06a decoding..."), Color.BLUE, theApp.boldFont);
+			theApp.writeLine(String.format("[INFO] F06a block detected. Switching to F06a decoding..."), Color.BLUE, theApp.getBoldFont());
 			theApp.setSystem(12);
-			theApp.setModeLabel(theApp.MODENAMES[12]);
+//			theApp.setModeLabel(theApp.MODENAMES[12]);
+			theApp.setModeLabel("F06a");
 			txType=2;
 		} else if (frameIndex == 1 && data[0] == 0x1b) {
 			txType = 0;
 		}
 
 		if (txType == 0) {
-			theApp.writeLine(String.format("[#%d] %03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%d%d | CRC %s", frameIndex, digits[0], digits[1], digits[2], digits[3], digits[4], digits[5], digits[6], digits[7], digits[8], digits[9], digits[10], digits[11], digits[12], digits[13], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldFont);
+			theApp.writeLine(String.format("[#%d] %03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%03d%d%d | CRC %s", frameIndex, digits[0], digits[1], digits[2], digits[3], digits[4], digits[5], digits[6], digits[7], digits[8], digits[9], digits[10], digits[11], digits[12], digits[13], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.getBoldFont());
 		} else if (txType == 1) {
-			theApp.writeLine(String.format("[#%d] %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldFont);
+			theApp.writeLine(String.format("[#%d] %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.getBoldFont());
 		}
 
 		bitCount=0;

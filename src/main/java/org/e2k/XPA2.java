@@ -21,7 +21,7 @@ public class XPA2 extends MFSK {
 	private final double BAUDRATE=7.8125;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	private long sampleCount=0;
 	private long symbolCounter=0;
 	private long syncFoundPoint;
@@ -32,7 +32,7 @@ public class XPA2 extends MFSK {
 	private final int PIVOT=5000;
 	private int characterCount;	
 	
-	public XPA2 (Rivet tapp)	{
+	public XPA2 (RivetApp tapp)	{
 		theApp=tapp;
 	}
 	
@@ -97,7 +97,7 @@ public class XPA2 extends MFSK {
 			if (dout!=null)	{
 				// Have start tone
 				setState(2);
-				theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(dout,Color.BLACK,theApp.getItalicFont());
 				return true;
 			}
 		}
@@ -128,7 +128,7 @@ public class XPA2 extends MFSK {
 			// Remember this value as it is the start of the energy values
 			syncFoundPoint=symbolCounter;
 			theApp.setStatusLabel("Sync Found");
-			theApp.writeLine((theApp.getTimeStamp()+" Sync tone found"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" Sync tone found"),Color.BLACK,theApp.getItalicFont());
 		}	
 		// Set the symbol timing
 		if (state==3)	{
@@ -146,7 +146,7 @@ public class XPA2 extends MFSK {
 			symbolCounter=(int)samplesPerSymbol-(perfectPoint-sampleCount);
 			setState(4);
 			theApp.setStatusLabel("Symbol Timing Achieved");
-			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK,theApp.getItalicFont());
 			theApp.newLineWrite();
 			return true;
 		}
@@ -192,7 +192,7 @@ public class XPA2 extends MFSK {
 		String tChar=getChar(freq,previousCharacter);
 		// If we get two End Tones in a row then stop decoding
 		if ((tChar=="R")&&(previousCharacter=="End Tone")) {
-			theApp.writeLine((theApp.getTimeStamp()+" XPA2 Decode Complete"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" XPA2 Decode Complete"),Color.BLACK,theApp.getItalicFont());
 			setState(1);
 			return;
 		}
@@ -218,7 +218,7 @@ public class XPA2 extends MFSK {
 		}
 		// Write normal characters to the screen
 		if ((tChar!="Sync High")&&(tChar!="Sync Low")&&(tChar!="End Tone")&&(tChar!="UNID")&&(tChar!=""))	{
-			theApp.writeChar(tChar,Color.BLACK,theApp.boldFont);
+			theApp.writeChar(tChar,Color.BLACK,theApp.getBoldFont());
 			characterCount++;
 		}
 		// Remember the current character
@@ -226,14 +226,14 @@ public class XPA2 extends MFSK {
 		// Write to a new line after an End Tone
 		if (tChar=="End Tone")	{
         	groupCount=0;
-        	theApp.writeLine("End Tone",Color.BLACK,theApp.boldFont);
+        	theApp.writeLine("End Tone",Color.BLACK,theApp.getBoldFont());
         	return;
 			}
 		
         // Display UNID info
         if (tChar=="UNID")	{
         	groupCount=0;
-        	theApp.writeLine(("UNID "+freq+" Hz"),Color.BLACK,theApp.boldFont);
+        	theApp.writeLine(("UNID "+freq+" Hz"),Color.BLACK,theApp.getBoldFont());
         	// Add a newline here
         	theApp.newLineWrite();
         	return;

@@ -29,7 +29,7 @@ public class CIS3650 extends FSK {
 	private int state=0;
 	private int shift=200;
 	private double samplesPerSymbol50;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private int highTone;
@@ -50,7 +50,7 @@ public class CIS3650 extends FSK {
 	private final double KALMAN2=0.009;
 	private final double EARLYLATEADJUST=2;
 	
-	public CIS3650 (Rivet tapp)	{
+	public CIS3650 (RivetApp tapp)	{
 		theApp=tapp;
 	}
 	
@@ -119,7 +119,7 @@ public class CIS3650 extends FSK {
 						setState(3);
 						if (theApp.isDebug()==true)	{
 							String dout=theApp.getTimeStamp()+" CIS 36-50 50 baud sync sequence found : lowBin="+Integer.toString(lowBin)+" highBin="+Integer.toString(highBin);
-							theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+							theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 						}
 						b7Count=0;
 						countSinceSync=0;
@@ -128,7 +128,7 @@ public class CIS3650 extends FSK {
 					else	{
 						if (theApp.isDebug()==true) 	{
 							String dout=theApp.getTimeStamp()+" Unable to obtain CIS 36-50 50 baud alternating sequence";
-							theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+							theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 						}
 						state=1;
 					}
@@ -154,7 +154,7 @@ public class CIS3650 extends FSK {
 						setState(1);
 						if (theApp.isDebug()==true)	{
 							String dout=theApp.getTimeStamp()+" CIS 36-50 50 baud sync timeout";
-							theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+							theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 						}
 					}
 				}
@@ -166,11 +166,11 @@ public class CIS3650 extends FSK {
 							syncState=2;
 							setState(state);
 							String d1=theApp.getTimeStamp()+" Message Start";
-							theApp.writeLine(d1,Color.BLACK,theApp.italicFont);
+							theApp.writeLine(d1,Color.BLACK, theApp.getItalicFont());
 							String d2="Sync 0x"+Long.toHexString(extractSyncAsLong());
-							theApp.writeLine(d2,Color.BLACK,theApp.boldFont);
+							theApp.writeLine(d2,Color.BLACK, theApp.getBoldFont());
 							String d3=extractSessionKey();
-							theApp.writeLine(d3,Color.BLACK,theApp.boldFont);
+							theApp.writeLine(d3,Color.BLACK, theApp.getBoldFont());
 							buffer21=0;
 							buffer7=0;
 							startCount=0;			
@@ -197,12 +197,12 @@ public class CIS3650 extends FSK {
 								if (buffer7<16) ch.append("0");
 								ch.append(Integer.toHexString(buffer7)+" ");
 								characterCount=characterCount+ch.length();
-								theApp.writeChar(ch.toString(),Color.BLACK,theApp.boldFont);
+								theApp.writeChar(ch.toString(),Color.BLACK, theApp.getBoldFont());
 							}
 							else	{
 								// Display 0x77 characters as signalling the end of a message
 								if (buffer7==0x77)	{
-									theApp.writeChar("<EOM>",Color.BLACK,theApp.boldFont);
+									theApp.writeChar("<EOM>",Color.BLACK, theApp.getBoldFont());
 									characterCount=characterCount+5;
 								}
 								else	{
@@ -212,7 +212,7 @@ public class CIS3650 extends FSK {
 									if (buffer7<16) ch.append("0");
 									ch.append(Integer.toHexString(buffer7)+"] ");
 									characterCount=characterCount+ch.length();
-									theApp.writeChar(ch.toString(),Color.BLACK,theApp.boldFont);
+									theApp.writeChar(ch.toString(),Color.BLACK, theApp.getBoldFont());
 									totalErrorCount++;
 								}
 							}
@@ -232,7 +232,7 @@ public class CIS3650 extends FSK {
 					// The message must have ended
 					else if (syncState==4)	{
 						String dout="End of Message ("+Integer.toString(totalCharacterCount)+" characters in this message "+Integer.toString(totalErrorCount)+" of these contained errors)";
-						theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+						theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 						countSinceSync=0;
 						syncState=1;
 						clearStartBuffer();
@@ -241,8 +241,8 @@ public class CIS3650 extends FSK {
 				}
 				else	{
 					// Debug mode so just display raw binary
-					if (bit==true)	theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-					else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+					if (bit==true)	theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+					else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 					// 100 binary characters per line
 					if (characterCount==100)	{
 						theApp.newLineWrite();

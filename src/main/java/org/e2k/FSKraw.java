@@ -23,7 +23,7 @@ public class FSKraw extends FSK {
 	private double baudRate=50;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private int highBin;
@@ -41,7 +41,7 @@ public class FSKraw extends FSK {
 	private boolean sBit0;
 	private boolean sBit1;
 	
-	public FSKraw (Rivet tapp)	{
+	public FSKraw (RivetApp tapp)	{
 		theApp=tapp;
 		samplesPerSymbol=samplesPerSymbol(baudRate,8000);
 		circularBitSet.setTotalLength(1024);
@@ -117,14 +117,14 @@ public class FSKraw extends FSK {
 					clearAdjBuffer();	
 					// If displaying then show this info
 					if (display==true)	{
-						theApp.writeLine(sRet,Color.BLACK,theApp.italicFont);
+						theApp.writeLine(sRet,Color.BLACK, theApp.getItalicFont());
 						// Add a newline
 						theApp.newLineWrite();
 						// Display the bits received during sync
-						if (sBit0==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-						else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
-						if (sBit1==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-						else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+						if (sBit0==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+						else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
+						if (sBit1==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+						else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 						characterCounter=2;
 					}	
 				}
@@ -141,8 +141,8 @@ public class FSKraw extends FSK {
 				else display=true;
 				// Display this but only if we are still in state 2 (to prevent any duff binary appearing)
 				if ((display==true)&&(state==2))	{
-					if (ibit==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-					else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+					if (ibit==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+					else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 					characterCounter++;
 					bitsReceived++;
 				}
@@ -247,7 +247,7 @@ public class FSKraw extends FSK {
 			if (display==true)	{
 				// Tell the user how many bits were received
 				String line="("+Long.toString(bitsReceived)+" bits received)";
-				theApp.writeLine(line,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(line,Color.BLACK, theApp.getItalicFont());
 				// Add a new line after this
 				theApp.newLineWrite();
 			}	
@@ -372,7 +372,7 @@ public class FSKraw extends FSK {
 					charactersRemaining=trigger.getForwardGrab();
 					// Display the prior characters in the backward grab
 					if (trigger.getBackwardGrab()>0)	{
-						theApp.writeLine(trigger.getBackwardBitsString(circularBitSet),Color.BLACK,theApp.boldFont);
+						theApp.writeLine(trigger.getBackwardBitsString(circularBitSet),Color.BLACK, theApp.getBoldFont());
 					}
 					activeTrigger=true;
 					showTrigger=true;
@@ -383,7 +383,7 @@ public class FSKraw extends FSK {
 					theApp.newLineWrite();
 			        // then the trigger description
 					String des=theApp.getTimeStamp()+" "+trigger.getTriggerDescription();
-					theApp.writeLine(des,Color.BLUE,theApp.italicFont);
+					theApp.writeLine(des,Color.BLUE, theApp.getItalicFont());
 					// Write another newline
 					theApp.newLineWrite();
 				}

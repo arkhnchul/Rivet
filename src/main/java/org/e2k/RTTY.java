@@ -21,7 +21,7 @@ public class RTTY extends FSK {
 	private double baudRate=50;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private CircularDataBuffer energyBuffer=new CircularDataBuffer();
@@ -42,7 +42,7 @@ public class RTTY extends FSK {
 	private double previousSymbolTotal;
 	private double oldSymbolPercentage[]=new double[4];
 	
-	public RTTY (Rivet tapp)	{
+	public RTTY (RivetApp tapp)	{
 		theApp=tapp;
 		samplesPerSymbol=samplesPerSymbol(baudRate,8000);
 	}
@@ -108,7 +108,7 @@ public class RTTY extends FSK {
 			if (sampleCount>0)	{
 				sRet=syncSequenceHunt(circBuf,waveData);
 				if (sRet!=null)	{
-					theApp.writeLine(sRet,Color.BLACK,theApp.italicFont);
+					theApp.writeLine(sRet,Color.BLACK, theApp.getItalicFont());
 					setState(2);
 					energyBuffer.setBufferCounter(0);
 					bcount=0;
@@ -164,7 +164,7 @@ public class RTTY extends FSK {
 					symbolCounter=(int)samplesPerSymbol/2;
 					// If debugging display the character buffer in binary form + the number of bits since the last character and this baudot character
 					if (theApp.isDebug()==true)	{
-						theApp.writeLine((getCharBuffer()+" ("+Integer.toString(bcount)+")  "+getBaudotChar()),Color.BLACK,theApp.italicFont);
+						theApp.writeLine((getCharBuffer()+" ("+Integer.toString(bcount)+")  "+getBaudotChar()),Color.BLACK, theApp.getItalicFont());
 					}
 					else	{
 						// Display the character in the standard way
@@ -180,7 +180,7 @@ public class RTTY extends FSK {
 							theApp.newLineWrite(); 
 						}
 						else	{
-							theApp.writeChar(ch,Color.BLACK,theApp.boldFont);
+							theApp.writeChar(ch,Color.BLACK, theApp.getBoldFont());
 							characterCount++;
 						}
 					}

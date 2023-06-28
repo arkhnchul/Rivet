@@ -22,7 +22,7 @@ public class FSK200500 extends FSK {
 	private int baudRate=200;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private StringBuilder lineBuffer=new StringBuilder();
@@ -39,7 +39,7 @@ public class FSK200500 extends FSK {
 	private int adjCounter=0;
 	private double errorPercentage;
 	
-	public FSK200500 (Rivet tapp,int baud)	{
+	public FSK200500 (RivetApp tapp,int baud)	{
 		baudRate=baud;
 		theApp=tapp;
 	}
@@ -105,7 +105,7 @@ public class FSK200500 extends FSK {
 			else dout=null;
 			if (dout!=null)	{
 				setState(2);
-				theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 				energyBuffer.setBufferCounter(0);
 				bcount=0;
 				totalCharCounter=0;
@@ -137,7 +137,7 @@ public class FSK200500 extends FSK {
 					// If debugging display the character buffer in binary form + the number of bits since the last character and this baudot character
 					if (theApp.isDebug()==true)	{
 						String dout=getCharBuffer()+" ("+Integer.toString(bcount)+")  "+getBaudotChar();
-						theApp.writeLine(dout,Color.BLACK,theApp.boldFont);
+						theApp.writeLine(dout,Color.BLACK, theApp.getBoldFont());
 					}
 					else	{
 						// Display the character in the standard way
@@ -148,7 +148,7 @@ public class FSK200500 extends FSK {
 						else if (ch.equals(getBAUDOT_LETTERS(8))) theApp.newLineWrite();
 						else	{
 							lineBuffer.append(ch);
-							theApp.writeChar(ch,Color.BLACK,theApp.boldFont);
+							theApp.writeChar(ch,Color.BLACK, theApp.getBoldFont());
 							characterCount++;
 							// Does the line buffer end with "162)5761" if so start a new line
 							if (lineBuffer.lastIndexOf("162)5761")!=-1) characterCount=MAXCHARLENGTH;
@@ -163,7 +163,7 @@ public class FSK200500 extends FSK {
 						// If more than 50% of the received characters are bad we have a serious problem
 						if (errorPercentage>50)	{
 							String dout=theApp.getTimeStamp()+" FSK200/500 Sync Lost";
-							theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+							theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 							setState(1);
 						}
 					}

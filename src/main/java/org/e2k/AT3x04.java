@@ -82,7 +82,7 @@ public class AT3x04 extends OFDM {
 			startCarrierCounter=0;
 			// Add a user warning that AT3x04 doesn't yet decode
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			theApp.writeLine("Please note that this mode is experimental and doesn't work yet !",Color.RED,theApp.italicFont);
+			theApp.writeLine("Please note that this mode is experimental and doesn't work yet !",Color.RED, theApp.getItalicFont());
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			setState(1);
 			return true;
@@ -126,7 +126,7 @@ public class AT3x04 extends OFDM {
 					    	sb.append(" , Carrier 12 at "+Double.toString(toneFreq)+" Hz");
 					    	toneFreq=toneFreq-2200;
 					    	sb.append(" + Carrier 1 at "+Double.toString(toneFreq)+" Hz");
-					    	theApp.writeLine(sb.toString(),Color.BLACK,theApp.boldFont);	
+					    	theApp.writeLine(sb.toString(),Color.BLACK, theApp.getBoldFont());
 			    			
 			    		}
 			    	}

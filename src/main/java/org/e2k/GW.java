@@ -21,7 +21,7 @@ public class GW extends FSK {
 	
 	private int state=0;
 	private double samplesPerSymbol100;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private int highTone;
@@ -40,7 +40,7 @@ public class GW extends FSK {
 	private long fragmentStartTime=0;
 	private boolean shoreSide;
 	
-	public GW (Rivet tapp)	{
+	public GW (RivetApp tapp)	{
 		theApp=tapp;
 		dataBitSet.setTotalLength(200);
 	}
@@ -95,8 +95,8 @@ public class GW extends FSK {
 				dataBitSet.add(ibit);
 				// Debug only
 				if (theApp.isDebug()==true)	{
-					if (ibit==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-					else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+					if (ibit==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+					else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 					characterCount++;
 					// Have we reached the end of a line
 					if (characterCount==80)	{
@@ -287,7 +287,7 @@ public class GW extends FSK {
 					for (a=0;a<18;a++)	{
 						lo.append(" "+Integer.toHexString(frame.get(a))+" ");
 					}
-					if (theApp.isViewGWChannelMarkers()==true) theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+					if (theApp.isViewGWChannelMarkers()==true) theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 					// We now know we are monitoring the shore side
 					shoreSide=true;
 					return;
@@ -327,7 +327,7 @@ public class GW extends FSK {
 				// shore side GW broadcasts
 				if ((difTime>60)&&(positionFragmentCounter>0))	{
 					String line=theApp.getTimeStamp()+" position report timeout (fragment Count is "+Integer.toString(positionFragmentCounter)+")";
-					theApp.writeLine(line,Color.RED,theApp.boldFont);
+					theApp.writeLine(line,Color.RED, theApp.getBoldFont());
 					receivingPositionReport=false;
 				}
 			}
@@ -343,9 +343,9 @@ public class GW extends FSK {
 				fragmentStartTime=System.currentTimeMillis()/1000;
 				//positionReport.append(theApp.getTimeStamp()+" "+displayGWAsAscii(0));
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Display the content 
-				theApp.writeLine(displayGWAsAscii(0),Color.BLUE,theApp.boldFont);
+				theApp.writeLine(displayGWAsAscii(0),Color.BLUE, theApp.getBoldFont());
 				return;
 			}
 			// An ongoing position report
@@ -368,17 +368,17 @@ public class GW extends FSK {
 				// Count the number of fragment sent
 				positionFragmentCounter++;
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
-				theApp.writeLine(displayGWAsAscii(0),Color.BLUE,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
+				theApp.writeLine(displayGWAsAscii(0),Color.BLUE, theApp.getBoldFont());
 				return;
 			}
 			// End of a position report
 			// Type 5 Subtype 118
 			else if ((type==5)&&(subType==118))	{
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Display the content 
-				theApp.writeLine(displayGWAsAscii(0),Color.BLUE,theApp.boldFont);
+				theApp.writeLine(displayGWAsAscii(0),Color.BLUE, theApp.getBoldFont());
 				// Have we a complete position report here ?
 				createPositionReportLine();
 				return;
@@ -386,9 +386,9 @@ public class GW extends FSK {
 			// Type 5 Subtype 54 
 			else if ((type==5)&&(subType==54))	{
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Display the content 
-				theApp.writeLine(displayGWAsAscii(0),Color.BLUE,theApp.boldFont);
+				theApp.writeLine(displayGWAsAscii(0),Color.BLUE, theApp.getBoldFont());
 				// Have we a complete position report here ?
 				createPositionReportLine();
 				return;
@@ -396,15 +396,15 @@ public class GW extends FSK {
 			// Type 2 Subtype 106
 			else if ((type==2)&&(subType==106))	{
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Display the content 
-				theApp.writeLine(displayGWAsAscii(0),Color.BLUE,theApp.boldFont);
+				theApp.writeLine(displayGWAsAscii(0),Color.BLUE, theApp.getBoldFont());
 				return;
 			}
 			// Type 2 Subtype 101
 			else if ((type==2)&&(subType==101))	{
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Convert the payload to ints
 				List<Integer> mInts=dataBitSet.returnIntsFromStart(14);
 				// Display the MMSI and contents
@@ -414,15 +414,15 @@ public class GW extends FSK {
 					// We must be monitoring the shore side
 					shoreSide=true;
 					String mLines[]=getGW_Shore2101(mInts);
-					theApp.writeLine(mLines[0],colour,theApp.boldFont);
-					theApp.writeLine(mLines[1],colour,theApp.boldFont);
+					theApp.writeLine(mLines[0],colour, theApp.getBoldFont());
+					theApp.writeLine(mLines[1],colour, theApp.getBoldFont());
 				}
 				else	{
 					// Does this line contain an error report ?
 					String mLine=getGW_MMSI(mInts);
 					// Display in red if there is an error with ships.xml and blue otherwise
 					if (mLine.contains("ERROR")) colour=Color.RED;
-					theApp.writeLine(mLine,colour,theApp.boldFont);
+					theApp.writeLine(mLine,colour, theApp.getBoldFont());
 				}
 				return;
 			}
@@ -433,7 +433,7 @@ public class GW extends FSK {
 				// Convert the payload to ints
 				List<Integer> mInts=dataBitSet.returnIntsFromStart(14);
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				// Decode
 				// Shore
 				if (shoreSide==true)	{
@@ -445,18 +445,18 @@ public class GW extends FSK {
 					// Ship
 					mLine=getGW_Ship541(mInts);
 				}
-				theApp.writeLine(mLine[0],colour,theApp.boldFont);
-				theApp.writeLine(mLine[1],colour,theApp.boldFont);
+				theApp.writeLine(mLine[0],colour, theApp.getBoldFont());
+				theApp.writeLine(mLine[1],colour, theApp.getBoldFont());
 				return;
 			}
 			// Type 5 Subtype 63
 			else if ((type==5)&&(subType==63))	{
 				// Display the packet details
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 				return;
 			}
 			// If selected display possible bad packets
-			if (theApp.isDisplayBadPackets()==true) theApp.writeLine(lo.toString(),Color.RED,theApp.boldFont);
+			if (theApp.isDisplayBadPackets()==true) theApp.writeLine(lo.toString(),Color.RED, theApp.getBoldFont());
 			return;
 		}
 		// Handle very short packets
@@ -467,7 +467,7 @@ public class GW extends FSK {
 			String shortContent=dataBitSet.extractSectionFromStart(0,6);
 			if ((shortContent.equals("010101"))||(shortContent.equals("101010")))	{
 				lo.append(theApp.getTimeStamp()+" GW ACK");
-				theApp.writeLine(lo.toString(),Color.BLACK,theApp.boldFont);
+				theApp.writeLine(lo.toString(),Color.BLACK, theApp.getBoldFont());
 			}
 			return;
 		}
@@ -681,7 +681,7 @@ public class GW extends FSK {
 		// Check enough position fragments have been received
 		if (positionFragmentCounter<10)	{
 			String line="Position fragment count is "+Integer.toString(positionFragmentCounter);
-			theApp.writeLine(line,Color.RED,theApp.boldFont);
+			theApp.writeLine(line,Color.RED, theApp.getBoldFont());
 			return;
 		}
 		String curFrag=displayGWAsAscii(0);
@@ -689,7 +689,7 @@ public class GW extends FSK {
 		// It isn't so add this to the position report StringBuilder
 		else positionReport.append(curFrag);
 		// Display this position report
-		theApp.writeLine(positionReport.toString(),Color.BLUE,theApp.boldFont);
+		theApp.writeLine(positionReport.toString(),Color.BLUE, theApp.getBoldFont());
 	}
 	
 	// Decode a shore side MMSI

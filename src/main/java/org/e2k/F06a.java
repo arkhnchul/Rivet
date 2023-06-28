@@ -22,7 +22,7 @@ public class F06a extends FSK {
     private int baudRate=200;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	public long sampleCount=0;
 	private long symbolCounter=0;
 	private CircularDataBuffer energyBuffer=new CircularDataBuffer();
@@ -42,7 +42,7 @@ public class F06a extends FSK {
     private int txType;
     private int encodingType; //0: blocks will be parsed as raw binary; 1: blocks will be parsed as ASCII
 
-    public F06a (Rivet tapp,int baud)	{
+    public F06a (RivetApp tapp,int baud)	{
 		baudRate=baud;
 		theApp=tapp;
 		circularBitSet.setTotalLength(288);
@@ -117,7 +117,7 @@ public class F06a extends FSK {
 			if (sampleCount>0) dout=syncSequenceHunt(circBuf,waveData);
 			else dout=null;
 			if (dout!=null)	{
-				theApp.writeLine(dout,Color.BLACK,theApp.boldFont);
+				theApp.writeLine(dout,Color.BLACK, theApp.getBoldFont());
 				if (theApp.isDebug()==true) setState(3);
 				else setState(2);
 				energyBuffer.setBufferCounter(0);
@@ -147,8 +147,8 @@ public class F06a extends FSK {
 			if (symbolCounter>=samplesPerSymbol)	{
 				symbolCounter=0;
 				boolean ibit=fsk2001000FreqHalf(circBuf,waveData,0);
-				if (ibit==true) theApp.writeChar("1",Color.BLACK,theApp.boldFont);
-				else theApp.writeChar("0",Color.BLACK,theApp.boldFont);
+				if (ibit==true) theApp.writeChar("1",Color.BLACK, theApp.getBoldFont());
+				else theApp.writeChar("0",Color.BLACK, theApp.getBoldFont());
 				characterCount++;
 				// Display MAXCHARLENGTH characters on a line
 				if (characterCount==MAXCHARLENGTH)	{
@@ -307,7 +307,7 @@ public class F06a extends FSK {
 
 		// Check whether this block is the in-TX repeat divider.
 		if (checkDividerBlock(frame)) {
-			theApp.writeLine("----------------------------------------------------------", Color.BLUE, theApp.boldFont);
+			theApp.writeLine("----------------------------------------------------------", Color.BLUE, theApp.getBoldFont());
 			return;
 		}
 
@@ -341,7 +341,7 @@ public class F06a extends FSK {
 		if (frameIndex % 16 == 0) {
 			int frameCount = (data[0] << 3) | (data[1] >> 5);
 			int messageCount = data[1] & 0x1f;
-			theApp.writeLine(String.format("[#%d] [INFO] %d blocks, %d message(s)", frameIndex, frameCount, messageCount), Color.BLUE, theApp.boldFont);
+			theApp.writeLine(String.format("[#%d] [INFO] %d blocks, %d message(s)", frameIndex, frameCount, messageCount), Color.BLUE, theApp.getBoldFont());
 			return;
 		}
 
@@ -350,34 +350,35 @@ public class F06a extends FSK {
 			txType = 1;
 		}  else if (frameIndex == 1 && data[0] == 0x1b) {
             // Check this is standard F06
-            theApp.writeLine(String.format("[INFO] Standard F06 header block detected. Switching to F06 decoding..."), Color.BLUE, theApp.boldFont);
+            theApp.writeLine(String.format("[INFO] Standard F06 header block detected. Switching to F06 decoding..."), Color.BLUE, theApp.getBoldFont());
             theApp.setSystem(8);
-			theApp.setModeLabel(theApp.MODENAMES[8]);
+//			theApp.setModeLabel(theApp.MODENAMES[8]);
+			theApp.setModeLabel("F06 (FSK200/1000)");
 			txType=2;
 		}
 
 		if (txType == 0) {
             if (frameIndex == 1){
-				theApp.writeLine(String.format("[#%d] [INFO] File named %s, size %d bytes | CRC %s", frameIndex, getF06aFilename(data), getFileSize(data), isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.boldFont);
+				theApp.writeLine(String.format("[#%d] [INFO] File named %s, size %d bytes | CRC %s", frameIndex, getF06aFilename(data), getFileSize(data), isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.getBoldFont());
 				return;
 			}
             if (encodingType == 1){
                 //Parse ASCII
 				String contents = processF06aASCII(data, frameIndex, isValid);
                 if (frameIndex == 2){
-                    theApp.writeLine(String.format("[#%d] [INFO] CRC of file contents: 0x%02x%02x%02x%02x. File contents now follow... | CRC %s", frameIndex, data[0], data[1], data[2], data[3], isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.boldFont);
+                    theApp.writeLine(String.format("[#%d] [INFO] CRC of file contents: 0x%02x%02x%02x%02x. File contents now follow... | CRC %s", frameIndex, data[0], data[1], data[2], data[3], isValid ? "OK" : "ERROR"), isValid ? Color.BLUE : Color.RED, theApp.getBoldFont());
                 }
 				if (encodingType == 1){
 					//Additional check to avoid printing the block as ASCII in case a non-ASCII encoding is detected
-                	theApp.writeLine(String.format("[#%d] %s | CRC %s", frameIndex, contents, isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldMonospaceFont);
+                	theApp.writeLine(String.format("[#%d] %s | CRC %s", frameIndex, contents, isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.getBoldMonospaceFont());
 				}
             }
 			if (encodingType == 0){
                 //Parse raw binary
-                theApp.writeLine(String.format("[#%d] %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldMonospaceFont);
+                theApp.writeLine(String.format("[#%d] %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.getBoldMonospaceFont());
             }
 		} else if (txType == 1) {
-			theApp.writeLine(String.format("[#%d] %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.boldMonospaceFont);
+			theApp.writeLine(String.format("[#%d] %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c | CRC %s", frameIndex, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], isValid ? "OK" : "ERROR"), isValid ? Color.BLACK : Color.RED, theApp.getBoldMonospaceFont());
 		} 
 
 		bitCount=0;
@@ -454,7 +455,7 @@ public class F06a extends FSK {
 		if (nonPrintableChars > 10 && isValid){
 			//If we have a lot of non-printable characters with a valid CRC the file might not be encoded as ASCII
 			theApp.setF06aASCII(false);
-			theApp.writeLine("[INFO] This F06a file appears to be formatted in a non-ASCII format! Decoding will continue in raw binary.", Color.BLUE, theApp.boldFont);
+			theApp.writeLine("[INFO] This F06a file appears to be formatted in a non-ASCII format! Decoding will continue in raw binary.", Color.BLUE, theApp.getBoldFont());
 		}
 		return contents;
     }

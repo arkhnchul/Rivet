@@ -21,7 +21,7 @@ public class XPA extends MFSK {
 	private int baudRate=10;
 	private int state=0;
 	private double samplesPerSymbol;
-	private Rivet theApp;
+	private RivetApp theApp;
 	private long sampleCount=0;
 	private long symbolCounter=0;
 	private String previousCharacter;
@@ -31,7 +31,7 @@ public class XPA extends MFSK {
 	private long syncFoundPoint;
 	private int correctionFactor;
 	
-	public XPA (Rivet tapp,int baud)	{
+	public XPA (RivetApp tapp,int baud)	{
 		baudRate=baud;
 		theApp=tapp;
 	}
@@ -101,7 +101,7 @@ public class XPA extends MFSK {
 			if (dout!=null)	{
 				// Have start tone
 				setState(2);
-				theApp.writeLine(dout,Color.BLACK,theApp.italicFont);
+				theApp.writeLine(dout,Color.BLACK, theApp.getItalicFont());
 				return true;
 			}
 		}
@@ -134,7 +134,7 @@ public class XPA extends MFSK {
 			setState(3);
 			// Remember this value as it is the start of the energy values
 			syncFoundPoint=sampleCount;
-			theApp.writeLine((theApp.getTimeStamp()+" High sync tone found"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" High sync tone found"),Color.BLACK, theApp.getItalicFont());
 			return true;
 		}
 		
@@ -151,7 +151,7 @@ public class XPA extends MFSK {
 			// Calculate what the value of the symbol counter should be
 			symbolCounter=symbolCounter-perfectPoint;
 			setState(4);
-			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK, theApp.getItalicFont());
 			return true;
 		}
 		
@@ -234,7 +234,7 @@ public class XPA extends MFSK {
 		int tlength=0,llength=0;
 		// If we get two End Tones in a row then stop decoding
 		if ((tChar=="R")&&(previousCharacter=="End Tone")) {
-			theApp.writeLine((theApp.getTimeStamp()+" XPA Decode Complete"),Color.BLACK,theApp.italicFont);
+			theApp.writeLine((theApp.getTimeStamp()+" XPA Decode Complete"),Color.BLACK, theApp.getItalicFont());
 			lineBuffer.delete(0,lineBuffer.length());
 			// If this is a file don't keep trying to decode
 			// Also stop reading from the file
@@ -272,8 +272,8 @@ public class XPA extends MFSK {
 		if (tChar=="Message Start")	{
 			groupCount=0;
 			lineBuffer.delete((llength-tlength),llength);
-			theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
-			theApp.writeLine("Message Start",Color.BLACK,theApp.boldFont);
+			theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
+			theApp.writeLine("Message Start",Color.BLACK, theApp.getBoldFont());
         	lineBuffer.delete(0,lineBuffer.length());
         	return;
 			}
@@ -281,7 +281,7 @@ public class XPA extends MFSK {
 		if (tChar=="End Tone")	{
         	groupCount=0;
 			lineBuffer.delete((llength-tlength),llength);
-			theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
+			theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
         	lineBuffer.delete(0,lineBuffer.length());
         	// All done look for another message
         	setState(1);
@@ -293,8 +293,8 @@ public class XPA extends MFSK {
         	groupCount=0;
         	tlength=blockSync.length();
 			lineBuffer.delete((llength-tlength),llength);
-			if (lineBuffer.length()>0) theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
-			theApp.writeLine("Block Sync",Color.BLACK,theApp.boldFont);
+			if (lineBuffer.length()>0) theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
+			theApp.writeLine("Block Sync",Color.BLACK, theApp.getBoldFont());
         	lineBuffer.delete(0,lineBuffer.length());
         	return;
         	}
@@ -304,8 +304,8 @@ public class XPA extends MFSK {
         	groupCount=0;
         	tlength=sbreak.length();
 			lineBuffer.delete((llength-tlength),llength);
-			if (lineBuffer.length()>0) theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
-			theApp.writeLine(sbreak,Color.BLACK,theApp.boldFont);
+			if (lineBuffer.length()>0) theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
+			theApp.writeLine(sbreak,Color.BLACK, theApp.getBoldFont());
         	lineBuffer.delete(0,lineBuffer.length());
         	return;
         	}
@@ -313,8 +313,8 @@ public class XPA extends MFSK {
         if (lineBuffer.indexOf("UNID")!=-1)	{
         	groupCount=0;
 			lineBuffer.delete((llength-tlength),llength);
-			theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
-			theApp.writeLine(("UNID "+freq+" Hz"),Color.BLACK,theApp.boldFont);
+			theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
+			theApp.writeLine(("UNID "+freq+" Hz"),Color.BLACK, theApp.getBoldFont());
         	lineBuffer.delete(0,lineBuffer.length());
         	return;
         	}
@@ -323,7 +323,7 @@ public class XPA extends MFSK {
         // After 10 group spaces add a line break
         if (groupCount==10)	{
         	groupCount=0;
-        	theApp.writeLine((lineBuffer.toString()),Color.BLACK,theApp.boldFont);
+        	theApp.writeLine((lineBuffer.toString()),Color.BLACK, theApp.getBoldFont());
          	lineBuffer.delete(0,lineBuffer.length());
         	return;
         	}
