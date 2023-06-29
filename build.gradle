@@ -25,3 +25,14 @@ jar {
         attributes 'Main-Class': 'org.e2k.Rivet'
     }
 }
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'org.e2k.Rivet'
+    }
+//    destinationDirectory = file("$buildDir/libs")
+//    archiveBaseName = 'rivet-cli'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
