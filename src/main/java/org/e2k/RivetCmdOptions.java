@@ -9,7 +9,7 @@ public class RivetCmdOptions {
 
     public enum OptionName {
         MODE("m", "mode", "mode name, mandatory", true, true),
-        INPUT_FILE("i", "infile", "WAV input filename", true, true),
+        INPUT_FILE("i", "infile", "WAV input filename, \"-\" for STDIN", true, true),
         FSK_SHIFT(null, "shift", "FSK modes shift", false, true),
         FSK_BAUD(null, "baudrate", "FSK modes baudrate", false, true);
 

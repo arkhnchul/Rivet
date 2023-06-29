@@ -22,6 +22,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.List;
@@ -92,7 +93,7 @@ public class RivetCLI implements RivetApp {
 
         RivetCLI theApp = new RivetCLI();
 
-        String modeName=cmdOptions.getOptionValue(RivetCmdOptions.OptionName.MODE);
+        String modeName = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.MODE);
         theApp.setCurrentMode(RivetMode.valueOf(modeName));
         // remnants of the old decoder selection "system"
         theApp.setSystem(Arrays.asList(RivetMode.values())
@@ -144,11 +145,11 @@ public class RivetCLI implements RivetApp {
 
     public void setCurrentMode(RivetMode currentMode) {
         this.currentMode = currentMode;
-        switch (currentMode){
+        switch (currentMode) {
             case XPA10:
                 xpaHandler.setBaudRate(10);
                 break;
-            case  XPA20:
+            case XPA20:
                 xpaHandler.setBaudRate(20);
                 break;
         }
@@ -163,51 +164,27 @@ public class RivetCLI implements RivetApp {
         String disp;
         disp = getTimeStamp() + " Loading file " + fileName;
         writeLine(disp, Color.BLACK, null);
-        waveData = inputThread.startFileLoad(fileName);
-        // Make sure the program knows this data is coming from a file
-        waveData.setFromFile(true);
+        BufferedInputStream stream;
+        if (fileName.equals("-")) {
+            stream = new BufferedInputStream(System.in);
+        } else {
+            File wavFile = new File(fileName);
+            try {
+                stream = new BufferedInputStream(Files.newInputStream(wavFile.toPath()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         // Clear the data buffer
         circBuffer.setBufferCounter(0);
-        // Reset the system objects
-        // CROWD36
-        switch (getCurrentMode()) {
-            case CROWD36:
-                crowd36Handler.setState(0);
-                break;
-            case XPA10:
-            case XPA20:
-                xpaHandler.setState(0);
-                break;
-            case XPA2:
-                xpa2Handler.setState(0);
-                break;
-            case CIS36_50:
-                cis3650Handler.setState(0);
-                break;
-            case F01:
-                fsk200500Handler.setState(0);
-                break;
-            case CCIR493_4:
-                ccir493Handler.setState(0);
-                break;
-            case F06:
-                fsk2001000Handler.setState(0);
-                break;
-            case GWFSK:
-                gwHandler.setState(0);
-                break;
-            case RTTY:
-                rttyHandler.setState(0);
-                break;
-            case FSK:
-                fskHandler.setState(0);
-                break;
-            case F06a:
-                f06aHandler.setState(0);
-                break;
-        }
+        // Make sure the program knows this data is coming from a file
+        waveData.setFromFile(true);
         // Ensure the program knows we have a WAV file load ongoing
         wavFileLoadOngoing = true;
+        // Reset the system objects
+        resetDecoderState();
+
+        waveData = inputThread.startStreamLoad(stream);
     }
 
     // This is called when the input thread is busy getting data from a WAV file
@@ -459,16 +436,16 @@ public class RivetCLI implements RivetApp {
             // CROWD36 , XPA , XPA2 , CIS36-50 , FSK200/500 , FSK200/1000 , CCIR493-4 , GW , RTTY , RDFT , Experimental, F06a
             // why there was this check?
 //            if ((system == 0) || (system == 1) || (system == 2) || (system == 3) || (system == 4) || (system == 5) || (system == 6) || (system == 8) || (system == 7) || (system == 9) || (system == 10) || (system == 11) || (system == 12)) {
-                WaveData waveSetting = new WaveData();
-                waveSetting.setChannels(1);
-                waveSetting.setEndian(true);
-                waveSetting.setSampleSizeInBits(16);
-                waveSetting.setFromFile(false);
-                waveSetting.setSampleRate(8000.0);
-                waveSetting.setBytesPerFrame(2);
-                inputThread.setupAudio(waveSetting);
-                waveData = waveSetting;
-                this.soundCardInput = true;
+            WaveData waveSetting = new WaveData();
+            waveSetting.setChannels(1);
+            waveSetting.setEndian(true);
+            waveSetting.setSampleSizeInBits(16);
+            waveSetting.setFromFile(false);
+            waveSetting.setSampleRate(8000.0);
+            waveSetting.setBytesPerFrame(2);
+            inputThread.setupAudio(waveSetting);
+            waveData = waveSetting;
+            this.soundCardInput = true;
 //            }
         }
     }
