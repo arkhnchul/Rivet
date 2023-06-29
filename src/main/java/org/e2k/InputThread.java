@@ -45,7 +45,6 @@ public class InputThread extends Thread {
 
 
     public InputThread(RivetApp TtheApp) {
-        audioMixer = new AudioMixer();
         audioReady = false;
         gettingAudio = false;
         loadingFile = false;
@@ -226,6 +225,8 @@ public class InputThread extends Thread {
     // Setup the input audio device
     public void setupAudio(WaveData waveData) {
         try {
+            if(audioMixer == null)
+                audioMixer = new AudioMixer();
             // If the audio is already setup then close it
             if (audioReady) {
                 closeAudio();
