@@ -1,22 +1,21 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.0'
-    }
+plugins{
+    id 'java'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+group 'org.e2k'
+version '0.92-beta1'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    compile 'edu.emory.mathcs:JTransforms:2.4'
+    implementation 'edu.emory.mathcs:JTransforms:2.4'
     implementation "commons-cli:commons-cli:1.5.0"
 }
 
@@ -26,12 +25,12 @@ jar {
     }
 }
 
-task fatJar(type: Jar) {
+tasks.register('fatJar', Jar) {
     manifest {
         attributes 'Main-Class': 'org.e2k.Rivet'
     }
-//    destinationDirectory = file("$buildDir/libs")
-//    archiveBaseName = 'rivet-cli'
+    destinationDirectory = file("$buildDir/libs")
+//    archiveBaseName = 'rivet'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
