@@ -17,9 +17,8 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.swing.JOptionPane;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.PipedOutputStream;
+import java.io.*;
+import java.nio.file.Files;
 
 public class InputThread extends Thread {
     private boolean audioReady;
@@ -74,14 +73,12 @@ public class InputThread extends Thread {
         }
     }
 
-    public WaveData startFileLoad(String fileName) {
+    public WaveData startStreamLoad(BufferedInputStream stream) {
         WaveData waveData = new WaveData();
         try {
-            wavFile = new File(fileName);
-            fileSize = wavFile.length();
             fileCounter = 0;
             sampleCounter = 0;
-            audioInputStream = AudioSystem.getAudioInputStream(wavFile);
+            audioInputStream = AudioSystem.getAudioInputStream(stream);
             waveData.setBytesPerFrame(audioInputStream.getFormat().getFrameSize());
             waveData.setSampleRate(audioInputStream.getFormat().getSampleRate());
             waveData.setSampleSizeInBits(audioInputStream.getFormat().getSampleSizeInBits());
@@ -89,6 +86,20 @@ public class InputThread extends Thread {
             waveData.setEndian(audioInputStream.getFormat().isBigEndian());
             theApp.setSoundCardInputOnly(false);
             loadingFile = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(null, "Error in startFileLoad()\n" + e.toString(), "Rivet", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+        return waveData;
+    }
+
+    public WaveData startFileLoad(String fileName) {
+        WaveData waveData = new WaveData();
+        try {
+            wavFile = new File(fileName);
+            fileSize = wavFile.length();
+            waveData = startStreamLoad(new BufferedInputStream(Files.newInputStream(wavFile.toPath())));
         } catch (Exception e) {
             e.printStackTrace();
 //            JOptionPane.showMessageDialog(null, "Error in startFileLoad()\n" + e.toString(), "Rivet", JOptionPane.ERROR_MESSAGE);
