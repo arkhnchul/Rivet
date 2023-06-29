@@ -30,7 +30,6 @@ public class RivetCLI implements RivetApp {
 
     private static boolean RUNNING = true;
     public final String program_version = "Rivet (Build 91) Beta 3";
-    private int system = 1;
     public XPA xpaHandler;
     public XPA2 xpa2Handler;
     public CROWD36 crowd36Handler;
@@ -67,6 +66,7 @@ public class RivetCLI implements RivetApp {
     private boolean displayBadPackets = false;
     private boolean logInUTC = false;
     private final List<Ship> listLoggedShips = new ArrayList<Ship>();
+    private RivetMode currentMode;
 
     public RivetCLI() {
         xpaHandler = new XPA(this, 10);
@@ -93,8 +93,10 @@ public class RivetCLI implements RivetApp {
         RivetCLI theApp = new RivetCLI();
 
         String modeName=cmdOptions.getOptionValue(RivetCmdOptions.OptionName.MODE);
+        theApp.setCurrentMode(RivetMode.valueOf(modeName));
+        // remnants of the old decoder selection "system"
         theApp.setSystem(Arrays.asList(RivetMode.values())
-                .indexOf(RivetMode.valueOf(modeName)));
+                .indexOf(theApp.getCurrentMode()));
 
         String wavFileName = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.INPUT_FILE);
 
@@ -136,16 +138,24 @@ public class RivetCLI implements RivetApp {
         System.exit(0);
     }
 
-    public void setSystem(int system) {
-        this.system = system;
-        // 10 Baud XPA
-        if (system == 1) xpaHandler.setBaudRate(10);
-            // 20 Baud XPA
-        else if (system == 3) xpaHandler.setBaudRate(20);
+    public RivetMode getCurrentMode() {
+        return currentMode;
+    }
+
+    public void setCurrentMode(RivetMode currentMode) {
+        this.currentMode = currentMode;
+        switch (currentMode){
+            case XPA10:
+                xpaHandler.setBaudRate(10);
+                break;
+            case  XPA20:
+                xpaHandler.setBaudRate(20);
+                break;
+        }
     }
 
     public boolean isFSK() {
-        return system == 11;
+        return currentMode.equals(RivetMode.FSK);
     }
 
     // Tell the input thread to start to load a .WAV file
@@ -160,51 +170,39 @@ public class RivetCLI implements RivetApp {
         circBuffer.setBufferCounter(0);
         // Reset the system objects
         // CROWD36
-        switch (system) {
-            case 0:
+        switch (getCurrentMode()) {
+            case CROWD36:
                 crowd36Handler.setState(0);
                 break;
-            // XPA
-            case 1:
-            case 3:
+            case XPA10:
+            case XPA20:
                 xpaHandler.setState(0);
                 break;
-            // XPA2
-            case 2:
+            case XPA2:
                 xpa2Handler.setState(0);
                 break;
-            // Experimental
-            //else if (system==4)
-            // CIS36-50
-            case 5:
+            case CIS36_50:
                 cis3650Handler.setState(0);
                 break;
-            // FSK200/500
-            case 6:
+            case F01:
                 fsk200500Handler.setState(0);
                 break;
-            // CCIR493-4
-            case 7:
+            case CCIR493_4:
                 ccir493Handler.setState(0);
                 break;
-            // FSK200/1000
-            case 8:
+            case F06:
                 fsk2001000Handler.setState(0);
                 break;
-            // GW
-            case 9:
+            case GWFSK:
                 gwHandler.setState(0);
                 break;
-            // RTTY
-            case 10:
+            case RTTY:
                 rttyHandler.setState(0);
                 break;
-            // FSK (raw)
-            case 11:
+            case FSK:
                 fskHandler.setState(0);
                 break;
-            //F06a
-            case 12:
+            case F06a:
                 f06aHandler.setState(0);
                 break;
         }
@@ -229,22 +227,22 @@ public class RivetCLI implements RivetApp {
                     circBuffer.addToCircBuffer(0);
                 }
                 // Check if there is anything left to display
-                switch (system) {
-                    case 0:
+                switch (getCurrentMode()) {
+                    case CROWD36:
                         //if (crowd36Handler.getLineCount()>0) writeLine(crowd36Handler.getLineBuffer(),Color.BLACK,plainFont);
                         writeLine(crowd36Handler.lowHighFreqs(), Color.BLACK, null);
                         crowd36Handler.toneResults();
                         break;
-                    case 5:
+                    case CIS36_50:
                         //writeLine(cis3650Handler.lineBuffer.toString(),Color.BLACK,plainFont);
                         break;
-                    case 6:
+                    case F01:
                         writeLine(fsk200500Handler.getQuailty(), Color.BLACK, null);
                         break;
-                    case 8:
+                    case F06:
                         writeLine(fsk2001000Handler.getQuailty(), Color.BLACK, null);
                         break;
-                    case 12:
+                    case F06a:
                         writeLine(f06aHandler.getQuailty(), Color.BLACK, null);
                         break;
                 }
@@ -283,39 +281,39 @@ public class RivetCLI implements RivetApp {
         try {
             boolean res = false;
             // CROWD36
-            switch (system) {
-                case 0:
+            switch (getCurrentMode()) {
+                case CROWD36:
                     res = crowd36Handler.decode(circBuffer, waveData);
                     break;
-                case 1: // XPA
-                case 3:
+                case XPA10:
+                case XPA20:
                     res = xpaHandler.decode(circBuffer, waveData);
                     break;
-                case 2: // XPA2
+                case XPA2:
                     res = xpa2Handler.decode(circBuffer, waveData);
                     break;
-                case 5: // CIS36-50
+                case CIS36_50:
                     res = cis3650Handler.decode(circBuffer, waveData);
                     break;
-                case 6: // FSK200/500
+                case F01:
                     res = fsk200500Handler.decode(circBuffer, waveData);
                     break;
-                case 7: // CCIR493-4
+                case CCIR493_4:
                     res = ccir493Handler.decode(circBuffer, waveData);
                     break;
-                case 8: // FSK200/1000
+                case F06:
                     res = fsk2001000Handler.decode(circBuffer, waveData);
                     break;
-                case 9: // GW
+                case GWFSK:
                     res = gwHandler.decode(circBuffer, waveData);
                     break;
-                case 10: // RTTY
+                case RTTY:
                     res = rttyHandler.decode(circBuffer, waveData);
                     break;
-                case 11: // FSK (raw)
+                case FSK:
                     res = fskHandler.decode(circBuffer, waveData);
                     break;
-                case 12: //F06a
+                case F06a:
                     res = f06aHandler.decode(circBuffer, waveData);
                     break;
             }
@@ -459,7 +457,8 @@ public class RivetCLI implements RivetApp {
             this.soundCardInput = false;
         } else {
             // CROWD36 , XPA , XPA2 , CIS36-50 , FSK200/500 , FSK200/1000 , CCIR493-4 , GW , RTTY , RDFT , Experimental, F06a
-            if ((system == 0) || (system == 1) || (system == 2) || (system == 3) || (system == 4) || (system == 5) || (system == 6) || (system == 8) || (system == 7) || (system == 9) || (system == 10) || (system == 11) || (system == 12)) {
+            // why there was this check?
+//            if ((system == 0) || (system == 1) || (system == 2) || (system == 3) || (system == 4) || (system == 5) || (system == 6) || (system == 8) || (system == 7) || (system == 9) || (system == 10) || (system == 11) || (system == 12)) {
                 WaveData waveSetting = new WaveData();
                 waveSetting.setChannels(1);
                 waveSetting.setEndian(true);
@@ -470,8 +469,7 @@ public class RivetCLI implements RivetApp {
                 inputThread.setupAudio(waveSetting);
                 waveData = waveSetting;
                 this.soundCardInput = true;
-            }
-
+//            }
         }
     }
 
@@ -481,30 +479,42 @@ public class RivetCLI implements RivetApp {
 
     // Reset the decoder state
     public void resetDecoderState() {
-        // CROWD36
-        if (system == 0) crowd36Handler.setState(0);
-            // XPA
-        else if ((system == 1) || (system == 3)) xpaHandler.setState(0);
-            // XPA2
-        else if (system == 2) xpa2Handler.setState(0);
-            // Experimental
-            //else if (system==4)
-            // CIS36-50
-        else if (system == 5) cis3650Handler.setState(0);
-            // FSK200/500
-        else if (system == 6) fsk200500Handler.setState(0);
-            // CCIR493-4
-        else if (system == 7) ccir493Handler.setState(0);
-            // FSK200/1000
-        else if (system == 8) fsk2001000Handler.setState(0);
-            // GW
-        else if (system == 9) gwHandler.setState(0);
-            // RTTY
-        else if (system == 10) rttyHandler.setState(0);
-            // FSK (raw)
-        else if (system == 11) fskHandler.setState(0);
-            //F06a
-        else if (system == 12) f06aHandler.setState(0);
+        switch (getCurrentMode()) {
+            case CROWD36:
+                crowd36Handler.setState(0);
+                break;
+            case XPA10:
+            case XPA20:
+                xpaHandler.setState(0);
+                break;
+            case XPA2:
+                xpa2Handler.setState(0);
+                break;
+            case CIS36_50:
+                cis3650Handler.setState(0);
+                break;
+            case F01:
+                fsk200500Handler.setState(0);
+                break;
+            case CCIR493_4:
+                ccir493Handler.setState(0);
+                break;
+            case F06:
+                fsk2001000Handler.setState(0);
+                break;
+            case GWFSK:
+                gwHandler.setState(0);
+                break;
+            case RTTY:
+                rttyHandler.setState(0);
+                break;
+            case FSK:
+                fskHandler.setState(0);
+                break;
+            case F06a:
+                f06aHandler.setState(0);
+                break;
+        }
         // RDFT
         //else if (system==12) rdftHandler.setState(0);
     }
@@ -607,7 +617,7 @@ public class RivetCLI implements RivetApp {
             line = line + "'/>\n";
             xmlfile.write(line);
             // Mode
-            line = "<mode val='" + system + "'/>\n";
+            line = "<mode val='" + getCurrentMode() + "'/>\n";
             xmlfile.write(line);
             // CROWD36 sync tone
             line = "<c36tone val='" + crowd36Handler.getSyncHighTone() + "'/>\n";
@@ -704,7 +714,7 @@ public class RivetCLI implements RivetApp {
                         break;
                     // Mode
                     case "mode":
-                        system = Integer.parseInt(aval);
+                        setCurrentMode(RivetMode.valueOf(aval));
                         break;
                     // Crowd36 sync tone
                     case "c36tone":
@@ -1074,4 +1084,6 @@ public class RivetCLI implements RivetApp {
         return sb.toString();
     }
 
+    public void setSystem(int system) {
+    }
 }
