@@ -12,7 +12,8 @@ public class RivetCmdOptions {
         INPUT_FILE("i", "infile", "WAV input filename, \"-\" for STDIN", true, true),
         FSK_SHIFT(null, "shift", "FSK modes shift (FSK, RTTY, CIS36-50)", false, true),
         FSK_BAUD(null, "baudrate", "FSK modes baudrate (FSK, RTTY)", false, true),
-        FSK_STOPBITS(null, "stopbits", "FSK modes stopbits (RTTY)", false, true);
+        FSK_STOPBITS(null, "stopbits", "FSK modes stopbits (RTTY)", false, true),
+        CROWD36_HIGHSYNC(null, "highsync", "CROWD36 High sync tone number (0-33)", false, true);
 
         public final String shortOpt;
         public final String longOpt;
@@ -64,37 +65,32 @@ public class RivetCmdOptions {
 
     public void checkOptionsSanity() {
         boolean errorFound = false;
-        try {
-            RivetMode.valueOf(getOptionValue(OptionName.MODE));
-        } catch (Exception e) {
-            System.err.println("Unknown mode");
-            errorFound = true;
-        }
 
-        if (cmdLine.hasOption(OptionName.FSK_BAUD.longOpt)) {
-            try {
-                Double.valueOf(getOptionValue(OptionName.FSK_BAUD));
-            } catch (Exception e) {
-                System.err.println("Wrong value for " + OptionName.FSK_BAUD + ": " + getOptionValue(OptionName.FSK_BAUD));
-                errorFound = true;
-            }
-        }
-
-        if (cmdLine.hasOption(OptionName.FSK_STOPBITS.longOpt)) {
-            try {
-                Double.valueOf(getOptionValue(OptionName.FSK_STOPBITS));
-            } catch (Exception e) {
-                System.err.println("Wrong value for " + OptionName.FSK_STOPBITS + ": " + getOptionValue(OptionName.FSK_STOPBITS));
-                errorFound = true;
-            }
-        }
-
-        if (cmdLine.hasOption(OptionName.FSK_SHIFT.longOpt)) {
-            try {
-                Integer.valueOf(getOptionValue(OptionName.FSK_SHIFT));
-            } catch (Exception e) {
-                System.err.println("Wrong value for " + OptionName.FSK_SHIFT + ": " + getOptionValue(OptionName.FSK_SHIFT));
-                errorFound = true;
+        for (OptionName tmpOption : OptionName.values()) {
+            if (cmdLine.hasOption(tmpOption.longOpt)) {
+                try {
+                    String value = getOptionValue(tmpOption);
+                    switch (tmpOption) {
+                        case MODE:
+                            RivetMode.valueOf(value);
+                            break;
+                        case FSK_STOPBITS:
+                        case FSK_BAUD:
+                            Double.parseDouble(value);
+                            break;
+                        case FSK_SHIFT:
+                            Integer.parseInt(value);
+                            break;
+                        case CROWD36_HIGHSYNC:
+                            int highsync = Integer.parseInt(value);
+                            if (highsync < 0 || highsync > 33)
+                                throw new IllegalArgumentException();
+                            break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Wrong value for " + tmpOption.longOpt + ": " + getOptionValue(tmpOption));
+                    errorFound = true;
+                }
             }
         }
 
