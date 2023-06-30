@@ -78,7 +78,29 @@ public class InputThread extends Thread {
         try {
             fileCounter = 0;
             sampleCounter = 0;
-            audioInputStream = AudioSystem.getAudioInputStream(stream);
+            AudioInputStream srcStream = AudioSystem.getAudioInputStream(stream);
+            AudioFormat srcFormat = srcStream.getFormat();
+            // TODO log this properly
+            System.err.println(srcFormat);
+
+            if (srcFormat.getSampleRate() != 8000.0f
+                    || srcFormat.getChannels() != 1
+                    || srcFormat.getSampleSizeInBits() != 16) {
+                // TODO log this properly
+                System.err.println("Resampling audio");
+                AudioFormat dstFormat = new AudioFormat(
+                        srcFormat.getEncoding(),
+                        8000.0f,
+                        16,
+                        1,
+                        2,
+                        8000,
+                        srcFormat.isBigEndian()
+                );
+                audioInputStream = AudioSystem.getAudioInputStream(dstFormat, srcStream);
+            } else {
+                audioInputStream = srcStream;
+            }
             waveData.setBytesPerFrame(audioInputStream.getFormat().getFrameSize());
             waveData.setSampleRate(audioInputStream.getFormat().getSampleRate());
             waveData.setSampleSizeInBits(audioInputStream.getFormat().getSampleSizeInBits());
@@ -236,7 +258,7 @@ public class InputThread extends Thread {
     // Setup the input audio device
     public void setupAudio(WaveData waveData) {
         try {
-            if(audioMixer == null)
+            if (audioMixer == null)
                 audioMixer = new AudioMixer();
             // If the audio is already setup then close it
             if (audioReady) {
