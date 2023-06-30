@@ -111,6 +111,11 @@ public class RivetCLI implements RivetApp {
             theApp.setFSKStopbits(Double.valueOf(stopbitsStr));
         }
 
+        String highsyncStr = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.CROWD36_HIGHSYNC);
+        if(highsyncStr!=null){
+            theApp.setCROWD36SyncHighTone(Integer.valueOf(highsyncStr));
+        }
+
         String wavFileName = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.INPUT_FILE);
 
         // Get data from the sound card thread
@@ -509,25 +514,8 @@ public class RivetCLI implements RivetApp {
     }
 
     // Allows the user to set the CROWD36 high sync tone number
-    public void setCROWD36SyncHighTone(String sval) {
-//        // Create a panel that will contain the sync number
-//        JPanel panel = new JPanel();
-//        // Set JPanel layout using GridLayout
-//        panel.setLayout(new GridLayout(2, 1));
-//        // Create a label with text (Username)
-//        JLabel label = new JLabel("High Sync Tone Number (0 to 33)");
-//        // Create text field that will use to enter the high sync tone
-//        JTextField toneField = new JTextField(2);
-//        toneField.setText(Integer.toString(crowd36Handler.getSyncHighTone()));
-//        panel.add(label);
-//        panel.add(toneField);
-//        panel.setVisible(true);
-//        // Show JOptionPane that will ask user for this information
-//        int resp = JOptionPane.showConfirmDialog(window, panel, "Enter the CROWD36 High Sync Tone Number", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-//        if (resp == JOptionPane.OK_OPTION) {
-//            String sval = new String(toneField.getText());
-        crowd36Handler.setSyncHighTone(Integer.parseInt(sval));
-//        }
+    public void setCROWD36SyncHighTone(Integer val) {
+        crowd36Handler.setSyncHighTone(val);
     }
 
     public void setFSKBaudrate(Double baudrate) {
