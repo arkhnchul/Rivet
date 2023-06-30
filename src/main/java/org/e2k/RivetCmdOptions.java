@@ -10,8 +10,9 @@ public class RivetCmdOptions {
     public enum OptionName {
         MODE("m", "mode", "mode name, mandatory", true, true),
         INPUT_FILE("i", "infile", "WAV input filename, \"-\" for STDIN", true, true),
-        FSK_SHIFT(null, "shift", "FSK modes shift", false, true),
-        FSK_BAUD(null, "baudrate", "FSK modes baudrate", false, true);
+        FSK_SHIFT(null, "shift", "FSK modes shift (FSK, RTTY, CIS36-50)", false, true),
+        FSK_BAUD(null, "baudrate", "FSK modes baudrate (FSK, RTTY)", false, true),
+        FSK_STOPBITS(null, "stopbits", "FSK modes stopbits (RTTY)", false, true);
 
         public final String shortOpt;
         public final String longOpt;
@@ -46,6 +47,7 @@ public class RivetCmdOptions {
         formatter.printHelp("RivetCLI.class [ OPTIONS ]", buildOptions());
         System.out.println("Available modes:");
         System.out.println(Arrays.toString(RivetMode.values()));
+        System.out.println("FSK parameters accept arbitrary values.");
     }
 
     public void parseOptions(String[] args) {
@@ -67,6 +69,33 @@ public class RivetCmdOptions {
         } catch (Exception e) {
             System.err.println("Unknown mode");
             errorFound = true;
+        }
+
+        if (cmdLine.hasOption(OptionName.FSK_BAUD.longOpt)) {
+            try {
+                Double.valueOf(getOptionValue(OptionName.FSK_BAUD));
+            } catch (Exception e) {
+                System.err.println("Wrong value for " + OptionName.FSK_BAUD + ": " + getOptionValue(OptionName.FSK_BAUD));
+                errorFound = true;
+            }
+        }
+
+        if (cmdLine.hasOption(OptionName.FSK_STOPBITS.longOpt)) {
+            try {
+                Double.valueOf(getOptionValue(OptionName.FSK_STOPBITS));
+            } catch (Exception e) {
+                System.err.println("Wrong value for " + OptionName.FSK_STOPBITS + ": " + getOptionValue(OptionName.FSK_STOPBITS));
+                errorFound = true;
+            }
+        }
+
+        if (cmdLine.hasOption(OptionName.FSK_SHIFT.longOpt)) {
+            try {
+                Integer.valueOf(getOptionValue(OptionName.FSK_SHIFT));
+            } catch (Exception e) {
+                System.err.println("Wrong value for " + OptionName.FSK_SHIFT + ": " + getOptionValue(OptionName.FSK_SHIFT));
+                errorFound = true;
+            }
         }
 
         if (errorFound) {

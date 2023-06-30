@@ -95,9 +95,21 @@ public class RivetCLI implements RivetApp {
 
         String modeName = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.MODE);
         theApp.setCurrentMode(RivetMode.valueOf(modeName));
-        // remnants of the old decoder selection "system"
-        theApp.setSystem(Arrays.asList(RivetMode.values())
-                .indexOf(theApp.getCurrentMode()));
+
+        String baudrateStr = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.FSK_BAUD);
+        if (baudrateStr != null) {
+            theApp.setFSKBaudrate(Double.valueOf(baudrateStr));
+        }
+
+        String shiftStr = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.FSK_SHIFT);
+        if (shiftStr != null) {
+            theApp.setFSKShift(Integer.valueOf(shiftStr));
+        }
+
+        String stopbitsStr = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.FSK_STOPBITS);
+        if (stopbitsStr != null) {
+            theApp.setFSKStopbits(Double.valueOf(stopbitsStr));
+        }
 
         String wavFileName = cmdOptions.getOptionValue(RivetCmdOptions.OptionName.INPUT_FILE);
 
@@ -518,17 +530,25 @@ public class RivetCLI implements RivetApp {
 //        }
     }
 
-    public void setBEEOptions(int shift) {
-        cis3650Handler.setShift(shift);
+    public void setFSKBaudrate(Double baudrate) {
+        if (baudrate != null) {
+            rttyHandler.setBaudRate(baudrate);
+            fskHandler.setBaudRate(baudrate);
+        }
     }
 
-    public void setRTTYOptions(double baudrate, int shift, double stopbits) {
-        rttyHandler.setBaudRate(baudrate);
-        rttyHandler.setShift(shift);
-        rttyHandler.setStopBits(stopbits);
+    public void setFSKShift(Integer shift) {
+        if (shift != null) {
+            cis3650Handler.setShift(shift);
+            rttyHandler.setShift(shift);
+            fskHandler.setShift(shift);
+        }
+    }
 
-        fskHandler.setBaudRate(baudrate);
-        fskHandler.setShift(shift);
+    public void setFSKStopbits(Double stopbits) {
+        if (stopbits != null) {
+            rttyHandler.setStopBits(stopbits);
+        }
     }
 
     public boolean isInvertSignal() {
