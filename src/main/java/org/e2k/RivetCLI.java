@@ -471,6 +471,31 @@ public class RivetCLI implements RivetApp {
         this.soundCardInput = s;
     }
 
+    @Override
+    public void writeInfo(String line) {
+        System.err.println(line);
+    }
+
+    @Override
+    public void writeWarning(String line){
+        System.err.println("WARNING: "+line);
+    }
+
+    @Override
+    public void writeError(String line) {
+        System.err.println("ERROR: "+line);
+    }
+
+    @Override
+    public void writeData(String line) {
+        System.out.println(line);
+    }
+
+    @Override
+    public void writeChar(String ch){
+        System.out.print(ch);
+    }
+
     // Reset the decoder state
     public void resetDecoderState() {
         switch (getCurrentMode()) {

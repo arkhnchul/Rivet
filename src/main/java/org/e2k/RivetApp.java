@@ -30,4 +30,10 @@ public interface RivetApp {
     int getActiveTriggerCount();
     List<Trigger> getListTriggers();
     void setSoundCardInputOnly(boolean s);
+
+    void writeInfo(String line);
+    void writeWarning(String line);
+    void writeError(String line);
+    void writeData(String line);
+    void writeChar(String ch);
 }

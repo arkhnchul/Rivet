@@ -601,7 +601,47 @@ public class Rivet implements RivetApp{
 	public void setSoundCardInputOnly(boolean s)	{
 		this.soundCardInput=s;
 	}
-	
+
+	@Override
+	public void writeInfo(String line) {
+		if (line!=null)	{
+			if (!pauseDisplay) display_view.addLine(line,Color.BLACK,getItalicFont());
+			if (logging) fileWriteLine(line);
+		}
+	}
+
+	@Override
+	public void writeWarning(String line) {
+		if (line!=null)	{
+			if (!pauseDisplay) display_view.addLine(line,Color.BLUE,getBoldFont());
+			if (logging) fileWriteLine(line);
+		}
+	}
+
+	@Override
+	public void writeError(String line) {
+		if (line!=null)	{
+			if (!pauseDisplay) display_view.addLine(line,Color.RED,getBoldFont());
+			if (logging) fileWriteLine(line);
+		}
+	}
+
+	@Override
+	public void writeData(String line) {
+		if (line!=null)	{
+			if (!pauseDisplay) display_view.addLine(line,Color.BLACK,getPlainFont());
+			if (logging) fileWriteLine(line);
+		}
+	}
+
+	@Override
+	public void writeChar(String ch) {
+		if(ch!=null) {
+			if (!pauseDisplay) display_view.addChar(ch, Color.BLACK, getPlainFont());
+			if (logging) fileWriteChar(ch);
+		}
+	}
+
 	// Reset the decoder state
 	public void resetDecoderState()	{
 		// CROWD36
