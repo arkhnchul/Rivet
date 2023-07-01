@@ -6,10 +6,8 @@ package org.e2k;
 //
 // * See http://signals.radioscanner.ru/base/signal37/ for further information
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 public class AT3x04 extends OFDM {
 	
@@ -60,19 +58,19 @@ public class AT3x04 extends OFDM {
 			// Check the sample rate
 			if (waveData.getSampleRate()!=8000.0)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"WAV files containing\nAT3x04 recordings must have\nbeen recorded at a sample rate\nof 8 KHz.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("WAV files containing AT3x04 recordings must have been recorded at a sample rate of 8 KHz.");
 				return false;
 			}
 			// Check this is a mono recording
 			if (waveData.getChannels()!=1)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"Rivet can only process\nmono WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("Rivet can only process nmono WAV files.");
 				return false;
 			}
 			// Check this is a 16 bit WAV file
 			if (waveData.getSampleSizeInBits()!=16)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"Rivet can only process\n16 bit WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("Rivet can only process 16 bit WAV files.");
 				return false;
 			}
 			// sampleCount must start negative to account for the buffer gradually filling
@@ -82,7 +80,7 @@ public class AT3x04 extends OFDM {
 			startCarrierCounter=0;
 			// Add a user warning that AT3x04 doesn't yet decode
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			theApp.writeLine("Please note that this mode is experimental and doesn't work yet !",Color.RED, theApp.getItalicFont());
+			theApp.writeWarning("Please note that this mode is experimental and doesn't work yet !");
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			setState(1);
 			return true;
@@ -126,7 +124,7 @@ public class AT3x04 extends OFDM {
 					    	sb.append(" , Carrier 12 at "+Double.toString(toneFreq)+" Hz");
 					    	toneFreq=toneFreq-2200;
 					    	sb.append(" + Carrier 1 at "+Double.toString(toneFreq)+" Hz");
-					    	theApp.writeLine(sb.toString(),Color.BLACK, theApp.getBoldFont());
+					    	theApp.writeInfo(sb.toString());
 			    			
 			    		}
 			    	}
