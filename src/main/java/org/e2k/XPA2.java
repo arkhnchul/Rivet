@@ -13,9 +13,6 @@
 
 package org.e2k;
 
-import java.awt.Color;
-import javax.swing.JOptionPane;
-
 public class XPA2 extends MFSK {
 	
 	private final double BAUDRATE=7.8125;
@@ -60,19 +57,22 @@ public class XPA2 extends MFSK {
 			// Check the sample rate
 			if (waveData.getSampleRate()>11025.0)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"WAV files containing\nXPA2 recordings must have\nbeen recorded at a sample rate\nof 11.025 KHz or less.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+//				JOptionPane.showMessageDialog(null,"WAV files containing\nXPA2 recordings must have\nbeen recorded at a sample rate\nof 11.025 KHz or less.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("WAV files containing XPA2 recordings must have been recorded at a sample rate of 11.025 KHz or less.");
 				return false;
 			}
 			// Check this is a mono recording
 			if (waveData.getChannels()!=1)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"Rivet can only process\nmono WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+//				JOptionPane.showMessageDialog(null,"Rivet can only process\nmono WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("Rivet can only process mono WAV files.");
 				return false;
 			}
 			// Check this is a 16 bit WAV file
 			if (waveData.getSampleSizeInBits()!=16)	{
 				state=-1;
-				JOptionPane.showMessageDialog(null,"Rivet can only process\n16 bit WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+//				JOptionPane.showMessageDialog(null,"Rivet can only process\n16 bit WAV files.","Rivet", JOptionPane.INFORMATION_MESSAGE);
+				theApp.writeError("Rivet can only process mono WAV files.");
 				return false;
 			}
 			samplesPerSymbol=samplesPerSymbol(BAUDRATE,waveData.getSampleRate());
@@ -97,7 +97,8 @@ public class XPA2 extends MFSK {
 			if (dout!=null)	{
 				// Have start tone
 				setState(2);
-				theApp.writeLine(dout,Color.BLACK,theApp.getItalicFont());
+//				theApp.writeLine(dout,Color.BLACK,theApp.getItalicFont());
+				theApp.writeInfo(dout);
 				return true;
 			}
 		}
@@ -128,7 +129,8 @@ public class XPA2 extends MFSK {
 			// Remember this value as it is the start of the energy values
 			syncFoundPoint=symbolCounter;
 			theApp.setStatusLabel("Sync Found");
-			theApp.writeLine((theApp.getTimeStamp()+" Sync tone found"),Color.BLACK,theApp.getItalicFont());
+//			theApp.writeLine((theApp.getTimeStamp()+" Sync tone found"),Color.BLACK,theApp.getItalicFont());
+			theApp.writeInfo(theApp.getTimeStamp()+" Sync tone found");
 		}	
 		// Set the symbol timing
 		if (state==3)	{
@@ -146,7 +148,8 @@ public class XPA2 extends MFSK {
 			symbolCounter=(int)samplesPerSymbol-(perfectPoint-sampleCount);
 			setState(4);
 			theApp.setStatusLabel("Symbol Timing Achieved");
-			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK,theApp.getItalicFont());
+//			theApp.writeLine((theApp.getTimeStamp()+" Symbol timing found"),Color.BLACK,theApp.getItalicFont());
+			theApp.writeInfo(theApp.getTimeStamp()+" Symbol timing found");
 			theApp.newLineWrite();
 			return true;
 		}
@@ -192,7 +195,7 @@ public class XPA2 extends MFSK {
 		String tChar=getChar(freq,previousCharacter);
 		// If we get two End Tones in a row then stop decoding
 		if ((tChar=="R")&&(previousCharacter=="End Tone")) {
-			theApp.writeLine((theApp.getTimeStamp()+" XPA2 Decode Complete"),Color.BLACK,theApp.getItalicFont());
+			theApp.writeInfo(theApp.getTimeStamp()+" XPA2 Decode Complete");
 			setState(1);
 			return;
 		}
@@ -218,7 +221,7 @@ public class XPA2 extends MFSK {
 		}
 		// Write normal characters to the screen
 		if ((tChar!="Sync High")&&(tChar!="Sync Low")&&(tChar!="End Tone")&&(tChar!="UNID")&&(tChar!=""))	{
-			theApp.writeChar(tChar,Color.BLACK,theApp.getBoldFont());
+			theApp.writeChar(tChar);
 			characterCount++;
 		}
 		// Remember the current character
@@ -226,14 +229,15 @@ public class XPA2 extends MFSK {
 		// Write to a new line after an End Tone
 		if (tChar=="End Tone")	{
         	groupCount=0;
-        	theApp.writeLine("End Tone",Color.BLACK,theApp.getBoldFont());
+			theApp.newLineWrite();
+			theApp.writeInfo("End tone");
         	return;
 			}
 		
         // Display UNID info
         if (tChar=="UNID")	{
         	groupCount=0;
-        	theApp.writeLine(("UNID "+freq+" Hz"),Color.BLACK,theApp.getBoldFont());
+			theApp.writeData("UNID "+freq+" Hz");
         	// Add a newline here
         	theApp.newLineWrite();
         	return;
