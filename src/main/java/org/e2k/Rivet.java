@@ -50,11 +50,11 @@ public class Rivet implements RivetApp{
 	public final String program_version="Rivet (Build 91) Beta 3";
 	public boolean pReady=false;
 	private int system=1;
-	private final Font plainFont=new Font("SanSerif",Font.PLAIN,12);
-	private final Font boldFont=new Font("SanSerif",Font.BOLD,12);
-	private final Font italicFont=new Font("SanSerif",Font.ITALIC,12);
-	private final Font plainMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.PLAIN,12);
-	private final Font boldMonospaceFont=new Font(java.awt.Font.MONOSPACED,Font.BOLD,12);
+	private final Font plainFont=new Font(Font.SANS_SERIF,Font.PLAIN,12);
+	private final Font boldFont=new Font(Font.SANS_SERIF,Font.BOLD,12);
+	private final Font italicFont=new Font(Font.SANS_SERIF,Font.ITALIC,12);
+	private final Font plainMonospaceFont=new Font(Font.MONOSPACED,Font.PLAIN,12);
+	private final Font boldMonospaceFont=new Font(Font.MONOSPACED,Font.BOLD,12);
     public XPA xpaHandler=new XPA(this,10);	
     public XPA2 xpa2Handler=new XPA2(this);	
     public CROWD36 crowd36Handler=new CROWD36(this,40);	
